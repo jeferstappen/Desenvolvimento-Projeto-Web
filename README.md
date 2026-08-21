@@ -1,1 +1,1 @@
-# Projeto AghataCris da disciplina Desenvolvimento em projeto web
+# Projeto AghataCris da disciplina DESENVOLVIMENTO EM PROJETO WEB
