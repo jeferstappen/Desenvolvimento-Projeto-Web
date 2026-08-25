@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0D9488" />
+  <meta name="description" content="AGhataCris - Plataforma responsiva de pronto atendimento estético sob demanda em tempo real por geolocalização e aluguel de cadeiras ociosas." />
+  <title>AGhataCris - Pronto Atendimento Estético sob Demanda</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS for Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- App Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body>
+
+  <!-- Presentation Environment Simulator Container -->
+  <div class="simulator-container">
+    
+    <!-- Top Simulator Bar for Evaluators & Multi-Role Demonstration -->
+    <div id="simulator-toolbar" class="simulator-toolbar"></div>
+
+    <!-- Mobile Viewport Shell (PWA Experience) -->
+    <div class="app-viewport">
+      
+      <!-- Smartphone Status Bar Mockup -->
+      <div class="phone-status-bar">
+        <span>09:41</span>
+        <div class="phone-status-icons">
+          <span>5G</span>
+          <span>100% 🔋</span>
+        </div>
+      </div>
+
+      <!-- App Header -->
+      <header id="app-header" class="app-header"></header>
+
+      <!-- Dynamic Main Screen Container (SPA Views) -->
+      <main id="app-main-content" class="app-main"></main>
+
+      <!-- Bottom Navigation Bar (Dynamic per Role) -->
+      <nav id="bottom-nav" class="bottom-nav"></nav>
+
+    </div>
+
+  </div>
+
+  <!-- Leaflet JS for Map -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- App Scripts -->
+  <script src="js/state.js"></script>
+  <script src="js/components/modal.js"></script>
+  <script src="js/components/header.js"></script>
+  <script src="js/components/navbar.js"></script>
+  <script src="js/components/roleSwitcher.js"></script>
+
+  <!-- Views -->
+  <script src="js/views/authView.js"></script>
+  <script src="js/views/clienteHomeView.js"></script>
+  <script src="js/views/clienteFavoritasView.js"></script>
+  <script src="js/views/clienteHistoricoView.js"></script>
+  <script src="js/views/freelancerHomeView.js"></script>
+  <script src="js/views/freelancerAgendaView.js"></script>
+  <script src="js/views/freelancerCarteiraView.js"></script>
+  <script src="js/views/freelancerEspacosView.js"></script>
+  <script src="js/views/salaoHomeView.js"></script>
+  <script src="js/views/perfilView.js"></script>
+  <script src="js/views/adminView.js"></script>
+
+  <!-- Router & Bootstrap -->
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

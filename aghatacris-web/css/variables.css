@@ -1,0 +1,72 @@
+/* AGhataCris Design Tokens & Variables */
+:root {
+  /* Brand Accent Colors */
+  --primary-teal: #0D9488;        /* Teal principal */
+  --primary-teal-light: #14B8A6;  /* Teal claro */
+  --primary-teal-dark: #0F766E;   /* Teal escuro */
+  --primary-teal-soft: #CCFBF1;   /* Teal fundo suave */
+  --primary-teal-glow: rgba(13, 148, 136, 0.25);
+
+  --accent-emerald: #10B981;      /* Emerald Green */
+  --accent-emerald-dark: #059669; /* Emerald escuro */
+  --accent-emerald-soft: #D1FAE5; /* Emerald suave */
+  --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+
+  /* Secondary Accents */
+  --accent-cyan: #06B6D4;
+  --accent-coral: #F43F5E;
+  --accent-amber: #F59E0B;
+  --accent-purple: #8B5CF6;
+  --accent-blue: #3B82F6;
+
+  /* Neutral Backgrounds (Higiene, Luz e Confiança) */
+  --bg-app: #F8FAFC;              /* Slate 50 */
+  --bg-surface: #FFFFFF;          /* Pure White */
+  --bg-surface-elevated: #FFFFFF;
+  --bg-subtle: #F1F5F9;           /* Slate 100 */
+  --bg-hover: #E2E8F0;            /* Slate 200 */
+  --bg-glass: rgba(255, 255, 255, 0.85);
+
+  /* Typography Colors */
+  --text-primary: #0F172A;        /* Slate 900 */
+  --text-secondary: #475569;      /* Slate 600 */
+  --text-muted: #94A3B8;          /* Slate 400 */
+  --text-inverse: #FFFFFF;
+  --text-teal: #0D9488;
+  --text-emerald: #059669;
+
+  /* Borders & Dividers */
+  --border-light: #E2E8F0;        /* Slate 200 */
+  --border-subtle: #CBD5E1;       /* Slate 300 */
+  --border-focus: #0D9488;
+
+  /* Elevation & Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 6px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  --shadow-teal: 0 8px 24px -4px rgba(13, 148, 136, 0.35);
+  --shadow-emerald: 0 8px 24px -4px rgba(16, 185, 129, 0.35);
+
+  /* Radiuses */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Fonts */
+  --font-main: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+
+  /* App Dimensions */
+  --mobile-max-width: 430px;
+  --mobile-height: 880px;
+  --header-height: 64px;
+  --bottom-nav-height: 72px;
+}
