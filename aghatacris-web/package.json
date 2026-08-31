@@ -1,0 +1,24 @@
+{
+  "name": "aghatacris-web",
+  "version": "2.0.0",
+  "description": "AGhataCris - Plataforma responsiva de pronto atendimento estético sob demanda em tempo real por geolocalização e aluguel de cadeiras ociosas.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test_backend.js && node test_routes.js",
+    "test:backend": "node test_backend.js",
+    "test:routes": "node test_routes.js"
+  },
+  "keywords": [
+    "pwa",
+    "beauty-on-demand",
+    "geolocation",
+    "haversine",
+    "split-payment",
+    "marketplace",
+    "salao-parceiro"
+  ],
+  "author": "AGhataCris Team",
+  "license": "ISC"
+}

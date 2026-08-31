@@ -1,9 +1,9 @@
 /**
- * AGhataCris - Central State Management & Mock Database
- * Corresponds to the database models: usuario, espaco, atendimento
+ * AGhataCris - Central State Management & REST API Sync (Sprint 2)
+ * Corresponde aos modelos relacionais: usuario, espaco, atendimento, transacao
  */
 
-const STORAGE_KEY = 'aghatacris_state_v1';
+const STORAGE_KEY = 'aghatacris_state_v2';
 
 const defaultState = {
   currentRole: 'cliente', // 'cliente' | 'freelancer' | 'salao' | 'admin'
@@ -40,7 +40,7 @@ const defaultState = {
       isOnline: true,
       reservaAtiva: {
         id_espaco: 1,
-        nome_salao: 'Salão Beauty Lounge',
+        nome_salao: 'Studio Elegance Jardins',
         tipo_espaco: 'Cadeira de Cabelo',
         tempoRestanteSegundos: 1800 // 30 minutos
       }
@@ -62,7 +62,7 @@ const defaultState = {
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80'
     }
   },
-  // Mock Professionals (RF03 - raio 15km)
+  // Profissionais no Radar de 15km (RF03, RNF01)
   profissionais: [
     {
       id_usuario: 101,
@@ -92,8 +92,8 @@ const defaultState = {
     },
     {
       id_usuario: 103,
-      nome_completo: 'Juliana Silva',
-      especialidade: 'Manicure & Pedicure Gel',
+      nome_completo: 'Juliana Costa',
+      especialidade: 'Manicure Gel & Nail Art',
       avaliacao: 5.0,
       distanciaKm: 2.1,
       precoEstimado: 85.00,
@@ -117,7 +117,7 @@ const defaultState = {
       modalidade: 'Ambos'
     }
   ],
-  // Mock Salons and Spaces (RF07, RF08, RF09)
+  // Espaços Ociosos em Salões Parceiros (RF07, RF08, RF09)
   espacos: [
     {
       id_espaco: 1,
@@ -125,7 +125,7 @@ const defaultState = {
       nome_salao: 'Studio Elegance Jardins',
       tipo_espaco: 'Cadeira de Cabelo',
       preco_hora: 25.00,
-      status: 'Reservado', // 'Disponivel' | 'Reservado'
+      status: 'Reservado',
       distanciaKm: 1.2,
       horario_proximo: '14:30',
       foto: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&auto=format&fit=crop&q=80'
@@ -144,7 +144,7 @@ const defaultState = {
     {
       id_espaco: 3,
       id_salao: 4,
-      nome_salao: 'Belle Epoque Paulista',
+      nome_salao: 'Belle Époque Paulista',
       tipo_espaco: 'Bancada de Maquiagem',
       preco_hora: 20.00,
       status: 'Disponível',
@@ -153,7 +153,7 @@ const defaultState = {
       foto: 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=200&auto=format&fit=crop&q=80'
     }
   ],
-  // Mock Appointments (RF06, RF10 - Fig 5, Fig 6, Fig 8)
+  // Atendimentos e Split Payment (RF06, RF10)
   atendimentos: [
     {
       id_atendimento: 1001,
@@ -210,9 +210,9 @@ const defaultState = {
       data: '18 Abr, 16:15'
     }
   ],
-  // Filter state for discovery
+  // Filtros de busca no mapa
   filtros: {
-    modalidade: 'todos', // 'todos' | 'domicilio' | 'salao'
+    modalidade: 'todos',
     raioKm: 15,
     busca: ''
   }
@@ -223,6 +223,7 @@ class StateManager {
     this.state = this.loadState();
     this.listeners = [];
     this.startCountdownTimer();
+    this.syncWithBackend();
   }
 
   loadState() {
@@ -244,6 +245,52 @@ class StateManager {
     this.notify();
   }
 
+  async syncWithBackend() {
+    if (typeof window === 'undefined' || !window.API) return;
+    try {
+      const [prosRes, espacosRes, atendsRes] = await Promise.all([
+        window.API.getNearbyProfessionals({
+          latitude: this.state.currentUser.latitude,
+          longitude: this.state.currentUser.longitude,
+          raio: this.state.filtros.raioKm,
+          modalidade: this.state.filtros.modalidade,
+          busca: this.state.filtros.busca
+        }).catch(() => null),
+        window.API.listEspacos({
+          latitude: this.state.currentUser.latitude,
+          longitude: this.state.currentUser.longitude
+        }).catch(() => null),
+        window.API.listAtendimentos().catch(() => null)
+      ]);
+
+      if (prosRes && prosRes.profissionais) {
+        this.state.profissionais = prosRes.profissionais.map(p => ({
+          ...p,
+          precoEstimado: p.preco_estimado || p.precoEstimado || 75.0,
+          distanciaKm: p.distanciaKm || 1.0
+        }));
+      }
+
+      if (espacosRes && espacosRes.espacos) {
+        this.state.espacos = espacosRes.espacos.map(e => ({
+          ...e,
+          distanciaKm: e.distanciaKm || 1.2
+        }));
+      }
+
+      if (atendsRes && atendsRes.atendimentos) {
+        this.state.atendimentos = atendsRes.atendimentos.map(a => ({
+          ...a,
+          data: a.data_atendimento || a.data
+        }));
+      }
+
+      this.saveState();
+    } catch (e) {
+      console.log('Sync backend offline/fallback ativo:', e.message);
+    }
+  }
+
   getState() {
     return this.state;
   }
@@ -253,21 +300,39 @@ class StateManager {
       this.state.currentRole = role;
       this.state.currentUser = { ...this.state.rolesData[role] };
       this.saveState();
+      this.syncWithBackend();
     }
   }
 
   setFilterModalidade(modalidade) {
     this.state.filtros.modalidade = modalidade;
     this.saveState();
+    this.syncWithBackend();
   }
 
   setSearchQuery(query) {
     this.state.filtros.busca = query;
     this.saveState();
+    this.syncWithBackend();
   }
 
-  adicionarEspaco(novoEspaco) {
-    const espaco = {
+  async updateLocation(lat, lon) {
+    this.state.currentUser.latitude = lat;
+    this.state.currentUser.longitude = lon;
+    this.saveState();
+
+    if (window.API) {
+      try {
+        await window.API.updateLocation(this.state.currentUser.id_usuario, lat, lon);
+      } catch (e) {
+        console.warn('Erro ao sincronizar GPS com backend:', e);
+      }
+    }
+    this.syncWithBackend();
+  }
+
+  async adicionarEspaco(novoEspaco) {
+    const espacoLocal = {
       id_espaco: Date.now(),
       id_salao: this.state.currentUser.id_usuario,
       nome_salao: this.state.currentUser.nome_completo,
@@ -278,25 +343,62 @@ class StateManager {
       visualizacoes_hoje: 1,
       foto: novoEspaco.foto || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&auto=format&fit=crop&q=80'
     };
-    this.state.espacos.unshift(espaco);
+    this.state.espacos.unshift(espacoLocal);
     this.saveState();
+
+    if (window.API) {
+      try {
+        const res = await window.API.createEspaco({
+          id_salao: this.state.currentUser.id_usuario,
+          tipo_espaco: novoEspaco.tipo_espaco,
+          preco_hora: novoEspaco.preco_hora,
+          foto: novoEspaco.foto
+        });
+        if (res && res.espaco) {
+          espacoLocal.id_espaco = res.espaco.id_espaco;
+          this.saveState();
+        }
+      } catch (e) {
+        console.warn('Erro ao salvar espaço no backend:', e);
+      }
+    }
   }
 
-  toggleEspacoStatus(id_espaco) {
+  async toggleEspacoStatus(id_espaco) {
     const espaco = this.state.espacos.find(e => e.id_espaco === id_espaco);
     if (espaco) {
       espaco.status = espaco.status === 'Disponível' ? 'Reservado' : 'Disponível';
       this.saveState();
+
+      if (window.API) {
+        try {
+          if (espaco.status === 'Reservado') {
+            await window.API.reserveEspaco(id_espaco, this.state.currentUser.id_usuario);
+          } else {
+            await window.API.toggleEspacoStatus(id_espaco);
+          }
+        } catch (e) {
+          console.warn('Erro ao atualizar status do espaço no backend:', e);
+        }
+      }
     }
   }
 
-  finalizarAtendimentoAtual() {
+  async finalizarAtendimentoAtual() {
     const atual = this.state.atendimentos.find(a => a.status === 'Em Andamento');
     if (atual) {
       atual.status = 'Concluído';
       this.state.rolesData.freelancer.ganhosHoje += atual.valor_liquido;
       this.state.rolesData.freelancer.saldo += atual.valor_liquido;
       this.saveState();
+
+      if (window.API) {
+        try {
+          await window.API.updateAtendimentoStatus(atual.id_atendimento, 'Concluído');
+        } catch (e) {
+          console.warn('Erro ao finalizar atendimento no backend:', e);
+        }
+      }
     }
   }
 
@@ -304,7 +406,6 @@ class StateManager {
     setInterval(() => {
       if (this.state.rolesData.freelancer.reservaAtiva.tempoRestanteSegundos > 0) {
         this.state.rolesData.freelancer.reservaAtiva.tempoRestanteSegundos--;
-        // Update without full reload every sec to keep timer responsive
         const timerEl = document.getElementById('arrival-countdown');
         if (timerEl) {
           const totalSecs = this.state.rolesData.freelancer.reservaAtiva.tempoRestanteSegundos;

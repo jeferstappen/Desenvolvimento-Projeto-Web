@@ -1,4 +1,5 @@
 const http = require('http');
+const server = require('./server');
 
 const routesToTest = [
   '/',
@@ -9,6 +10,7 @@ const routesToTest = [
   '/css/layout.css',
   '/css/components.css',
   '/css/views.css',
+  '/js/api.js',
   '/js/state.js',
   '/js/router.js',
   '/js/components/modal.js',
@@ -26,13 +28,21 @@ const routesToTest = [
   '/js/views/salaoHomeView.js',
   '/js/views/perfilView.js',
   '/js/views/adminView.js',
-  '/js/app.js'
+  '/js/app.js',
+  '/api/health',
+  '/api/profissionais?latitude=-23.561684&longitude=-46.655981&raio=15',
+  '/api/espacos',
+  '/api/atendimentos',
+  '/api/admin/metricas'
 ];
 
 async function runTests() {
-  console.log('--- Iniciando Testes de Integridade de Rotas e Arquivos ---');
+  console.log('\n--- Iniciando Testes de Integridade de Rotas, Arquivos e Endpoints REST ---');
   let passCount = 0;
   let failCount = 0;
+
+  // Aguardar 200ms para estabilização
+  await new Promise(r => setTimeout(r, 200));
 
   for (const route of routesToTest) {
     try {
@@ -59,6 +69,7 @@ async function runTests() {
 
   console.log(`\nResultado: ${passCount} passaram, ${failCount} falharam.`);
   if (failCount > 0) process.exit(1);
+  process.exit(0);
 }
 
 runTests();

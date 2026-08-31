@@ -99,7 +99,7 @@ window.UI = {
         Ao confirmar, seu chamado de urgência será transmitido via geolocalização e a profissional terá até 3 minutos para aceite em tempo real.
       </p>
 
-      <button class="btn btn-primary" onclick="UI.confirmarChamado('${pro.nome_completo}')">
+      <button class="btn btn-primary" onclick="UI.confirmarChamado(${pro.id_usuario}, '${pro.nome_completo}', '${pro.especialidade}', ${pro.precoEstimado})">
         🚀 Confirmar Solicitação Imediata
       </button>
       <button class="btn btn-ghost" style="margin-top: 8px;" onclick="UI.closeModal()">
@@ -108,8 +108,30 @@ window.UI = {
     `);
   },
 
-  confirmarChamado(proName) {
+  async confirmarChamado(proId, proName, especialidade, preco) {
     this.closeModal();
+    const currentUser = window.appState.getState().currentUser;
+    
+    try {
+      if (window.API) {
+        const res = await window.API.createAtendimento({
+          id_cliente: currentUser.id_usuario,
+          id_freelancer: proId,
+          servico: especialidade || 'Atendimento sob Demanda',
+          tipo: 'Domicílio',
+          valor_total: preco || 75.0,
+          distancia_km: 1.2
+        });
+
+        if (res && res.atendimento) {
+          window.appState.getState().atendimentos.unshift(res.atendimento);
+          window.appState.saveState();
+        }
+      }
+    } catch (err) {
+      console.warn('Criar atendimento backend fallback:', err.message);
+    }
+
     this.showToast(`Solicitação enviada com sucesso para ${proName}!`, 'success');
   },
 

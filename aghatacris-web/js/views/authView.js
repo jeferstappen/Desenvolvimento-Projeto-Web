@@ -134,16 +134,57 @@ window.selectRegisterRole = function(role, el) {
   }
 };
 
-window.handleLoginSubmit = function() {
+window.handleLoginSubmit = async function() {
   const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+  try {
+    if (window.API) {
+      const res = await window.API.login(email, password);
+      if (res && res.user) {
+        const role = res.user.tipo_perfil.toLowerCase() === 'administrador' ? 'admin' : res.user.tipo_perfil.toLowerCase();
+        window.appState.setRole(role);
+        window.appState.getState().currentUser = { ...res.user };
+        window.appState.saveState();
+        UI.showToast(`Bem-vindo(a), ${res.user.nome_completo}!`, 'success');
+        window.location.hash = `#/${role}/home`;
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Login backend fallback:', err.message);
+  }
+
   UI.showToast(`Login realizado com sucesso!`, 'success');
   window.location.hash = `#/${window.appState.getState().currentRole}/home`;
 };
 
-window.handleRegisterSubmit = function() {
+window.handleRegisterSubmit = async function() {
   const name = document.getElementById('reg-name').value;
   const email = document.getElementById('reg-email').value;
+  const password = document.getElementById('reg-password').value;
   const role = window.selectedRegisterRole;
+
+  try {
+    if (window.API) {
+      const res = await window.API.register({
+        nome_completo: name,
+        email: email,
+        senha: password,
+        tipo_perfil: role === 'admin' ? 'Administrador' : (role === 'salao' ? 'Salao' : (role === 'freelancer' ? 'Freelancer' : 'Cliente'))
+      });
+      if (res && res.user) {
+        window.appState.setRole(role);
+        window.appState.getState().currentUser = { ...res.user };
+        window.appState.saveState();
+        UI.showToast(`Conta criada como ${role.toUpperCase()} no banco de dados!`, 'success');
+        window.location.hash = `#/${role}/home`;
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Cadastro backend fallback:', err.message);
+  }
 
   window.appState.setRole(role);
   window.appState.getState().currentUser.nome_completo = name;
