@@ -285,6 +285,24 @@ class StateManager {
         }));
       }
 
+      // Sincronizar dados financeiros e cadastrais do usuário autenticado a partir do banco
+      if (this.state.currentUser && this.state.currentUser.id_usuario) {
+        const userRes = await window.API.getMe(this.state.currentUser.id_usuario).catch(() => null);
+        if (userRes && userRes.user) {
+          const u = userRes.user;
+          if (u.saldo !== undefined) this.state.currentUser.saldo = parseFloat(u.saldo);
+          if (u.ganhos_hoje !== undefined) this.state.currentUser.ganhosHoje = parseFloat(u.ganhos_hoje);
+          if (u.receita_passiva_mes !== undefined) this.state.currentUser.receitaPassivaMes = parseFloat(u.receita_passiva_mes);
+
+          const role = this.state.currentRole;
+          if (this.state.rolesData[role]) {
+            if (u.saldo !== undefined) this.state.rolesData[role].saldo = parseFloat(u.saldo);
+            if (u.ganhos_hoje !== undefined) this.state.rolesData[role].ganhosHoje = parseFloat(u.ganhos_hoje);
+            if (u.receita_passiva_mes !== undefined) this.state.rolesData[role].receitaPassivaMes = parseFloat(u.receita_passiva_mes);
+          }
+        }
+      }
+
       this.saveState();
     } catch (e) {
       console.log('Sync backend offline/fallback ativo:', e.message);
@@ -387,18 +405,25 @@ class StateManager {
   async finalizarAtendimentoAtual() {
     const atual = this.state.atendimentos.find(a => a.status === 'Em Andamento');
     if (atual) {
-      atual.status = 'Concluído';
-      this.state.rolesData.freelancer.ganhosHoje += atual.valor_liquido;
-      this.state.rolesData.freelancer.saldo += atual.valor_liquido;
-      this.saveState();
-
       if (window.API) {
         try {
-          await window.API.updateAtendimentoStatus(atual.id_atendimento, 'Concluído');
+          const res = await window.API.updateAtendimentoStatus(atual.id_atendimento, 'Concluído');
+          if (res && res.atendimento) {
+            atual.status = 'Concluído';
+            atual.valor_liquido = res.atendimento.valor_liquido || atual.valor_liquido;
+            atual.taxa_plataforma = res.atendimento.taxa_plataforma || atual.taxa_plataforma;
+            atual.taxa_salao = res.atendimento.taxa_salao || atual.taxa_salao;
+          }
         } catch (e) {
           console.warn('Erro ao finalizar atendimento no backend:', e);
+          atual.status = 'Concluído';
         }
+      } else {
+        atual.status = 'Concluído';
       }
+
+      await this.syncWithBackend();
+      this.saveState();
     }
   }
 

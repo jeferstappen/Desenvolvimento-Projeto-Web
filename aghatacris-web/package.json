@@ -6,9 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "node test_backend.js && node test_routes.js",
+    "test": "node test_backend.js && node test_routes.js && node test_integration.js",
     "test:backend": "node test_backend.js",
-    "test:routes": "node test_routes.js"
+    "test:routes": "node test_routes.js",
+    "test:integration": "node test_integration.js"
   },
   "keywords": [
     "pwa",

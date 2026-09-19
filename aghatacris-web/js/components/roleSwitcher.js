@@ -30,8 +30,11 @@ window.renderSimulatorToolbar = function() {
     </div>
 
     <div class="toolbar-actions">
+      <button class="tool-toggle-btn" onclick="UI.openIntegrationTestsModal()" style="background: rgba(13, 148, 136, 0.15); border-color: var(--primary-teal); color: var(--primary-teal); font-weight: 700;">
+        🧪 Testes de Integração
+      </button>
       <button class="tool-toggle-btn" onclick="window.location.hash = '#/login'">
-        🔑 Tela de Login
+        🔑 Login
       </button>
       <button class="tool-toggle-btn" onclick="window.location.hash = '#/register'">
         📝 Cadastro

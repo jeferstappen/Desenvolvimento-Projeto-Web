@@ -7,7 +7,20 @@ window.renderFreelancerCarteiraView = function() {
   const state = window.appState.getState();
   const freeData = state.rolesData.freelancer;
 
-  const repasses = [
+  // Repasses reais vindos das transações concluídas no banco de dados
+  const atendimentosConcluidos = (state.atendimentos || [])
+    .filter(a => a.status === 'Concluído')
+    .map(a => ({
+      servico: a.servico,
+      data: a.data || a.data_atendimento || 'Hoje',
+      valorBruto: parseFloat(a.valor_total || 0),
+      taxaSalao: parseFloat(a.taxa_salao || 0),
+      taxaPlataforma: parseFloat(a.taxa_plataforma || (a.valor_total * 0.1)),
+      valorLiquido: parseFloat(a.valor_liquido || (a.valor_total * 0.9)),
+      tipo: a.tipo || 'No Salão'
+    }));
+
+  const repassesFallback = [
     {
       servico: 'Maquiagem Social',
       data: '11 Out, 14:00',
@@ -25,26 +38,10 @@ window.renderFreelancerCarteiraView = function() {
       taxaPlataforma: 13.00,
       valorLiquido: 97.00,
       tipo: 'No Salão'
-    },
-    {
-      servico: 'Limpeza de Pele',
-      data: '10 Out, 16:45',
-      valorBruto: 160.00,
-      taxaSalao: 0.00,
-      taxaPlataforma: 16.00,
-      valorLiquido: 144.00,
-      tipo: 'Domicílio'
-    },
-    {
-      servico: 'Design de Sobrancelha',
-      data: '10 Out, 09:15',
-      valorBruto: 80.00,
-      taxaSalao: 0.00,
-      taxaPlataforma: 8.00,
-      valorLiquido: 72.00,
-      tipo: 'Domicílio'
     }
   ];
+
+  const repasses = atendimentosConcluidos.length > 0 ? atendimentosConcluidos : repassesFallback;
 
   return `
     <div class="view-content-padded animate-fade-in">
