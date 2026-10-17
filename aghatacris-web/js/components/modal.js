@@ -217,6 +217,53 @@ window.UI = {
     `);
   },
 
+  openSalaoModal(salaoId) {
+    const saloes = window.getSaloesList ? window.getSaloesList() : [];
+    const salao = saloes.find(s => s.id_usuario === salaoId) || saloes[0];
+    if (!salao) return;
+
+    this.openModal(`
+      <div style="margin-bottom: 14px;">
+        <img src="${salao.avatar}" style="width: 100%; height: 140px; border-radius: var(--radius-md); object-fit: cover; margin-bottom: 12px; box-shadow: var(--shadow-sm);" />
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 1.15rem;">${salao.nome_completo}</h3>
+            <p class="text-xs text-muted" style="margin-top: 3px;">📍 ${salao.endereco} • <strong>${salao.distanciaKm} km de você</strong></p>
+          </div>
+          <span class="badge badge-emerald" style="font-weight: 700;">★ ${salao.avaliacao}</span>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-subtle); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 14px; font-size: 0.8rem; border-left: 3px solid var(--primary-teal);">
+        <strong style="color: var(--primary-teal);">🏢 Salão Parceiro Credenciado:</strong>
+        <p class="text-xs text-secondary" style="margin-top: 4px; line-height: 1.4;">
+          Estabelecimento credenciado pela Lei do Salão Parceiro (Lei nº 13.352/2016) com infraestrutura de alto padrão para pronto atendimento estético imediato.
+        </p>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">
+          Infraestrutura e Espaços no Salão
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          ${(salao.espacosDisponiveis || ['Cadeira de Cabelo (R$ 25/h)', 'Maca de Estética (R$ 30/h)']).map(e => `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-light); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 0.8rem;">
+              <span>💺 ${e}</span>
+              <span class="badge badge-teal" style="font-size: 0.7rem;">Disponível</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="UI.closeModal(); window.handleModalidadeFilter('salao'); UI.showToast('Exibindo profissionais no ${salao.nome_completo}', 'success');">
+        💇‍♀️ Chamar Profissional neste Salão
+      </button>
+      <button class="btn btn-ghost" style="margin-top: 8px;" onclick="UI.closeModal()">
+        Voltar
+      </button>
+    `);
+  },
+
   openNovoEspacoModal() {
     this.openModal(`
       <h3 class="modal-title">Cadastrar Novo Espaço Ocioso</h3>
@@ -465,5 +512,236 @@ window.UI = {
     runBtn.disabled = false;
     runBtn.innerHTML = `✅ Bateria Concluída: ${passed}/${testCases.length} Aprovados (100%)`;
     window.UI.showToast(`Testes de integração concluídos: ${passed}/${testCases.length} passaram!`, 'success');
+  },
+
+  openManualTestsModal() {
+    this.openModal(`
+      <div style="max-height: 78vh; overflow-y: auto; padding-right: 4px;">
+        <div class="flex items-center gap-2" style="margin-bottom: 12px;">
+          <span style="font-size: 1.5rem;">📋</span>
+          <div>
+            <h3 class="modal-title" style="margin: 0;">Roteiro de Testes Manuais Funcionais</h3>
+            <p class="text-xs text-muted">Ponto de Referência da 1ª Etapa • Requisitos Funcionais (RF01 ao RF10)</p>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-subtle); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 14px; font-size: 0.8rem; border-left: 3px solid var(--primary-emerald);">
+          <strong>Critério da Avaliação Docente (1ª Etapa):</strong>
+          Execute manualmente cada um dos casos abaixo diretamente na interface para auditar a conformidade com as regras de negócio e com o documento principal do projeto.
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          
+          <!-- CTM-01 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-01: Cadastro de Usuário e Segregação de Papéis</strong>
+              <span class="badge badge-emerald">RF01 • RNF03</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Todos os Usuários • <strong>Critério:</strong> Criar conta selecionando o papel (Cliente, Freelancer ou Salão) com hash criptográfico PBKDF2/SHA-256 no banco.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Acessar <em>#/register</em> ➔ Escolher perfil ➔ Preencher dados ➔ Clicar em 'Cadastrar' ➔ Validar mensagem e redirecionamento.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.location.hash = '#/register';">
+              👉 Ir para Tela de Cadastro (#/register)
+            </button>
+          </div>
+
+          <!-- CTM-02 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-02: Autenticação / Login com Validação de Hash</strong>
+              <span class="badge badge-emerald">RF01</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Todos • <strong>Critério:</strong> Validar recusa de senha incorreta (HTTP 401) e sucesso com redirecionamento ao perfil correspondente.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Acessar <em>#/login</em> ➔ Informar email e senha ➔ Entrar ➔ Verificar inicialização da sessão com omissão de hash no payload.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.location.hash = '#/login';">
+              👉 Ir para Tela de Login (#/login)
+            </button>
+          </div>
+
+          <!-- CTM-03 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-03: Captura e Atualização de Geolocalização GPS</strong>
+              <span class="badge badge-emerald">RF02 • RNF05</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Cliente • <strong>Critério:</strong> Capturar coordenadas de latitude/longitude e sincronizar no banco de dados com consentimento explícito.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Alternar para perfil 'Cliente' ➔ Verificar marcador azul no mapa Leaflet ➔ Clicar no botão de mira de GPS para sincronizar.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.switchRoleAndNavigate('cliente');">
+              👉 Ver Mapa e GPS do Cliente (#/cliente/home)
+            </button>
+          </div>
+
+          <!-- CTM-04 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-04: Radar Haversine no Raio de até 15 km</strong>
+              <span class="badge badge-emerald">RF03 • RNF01</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Cliente • <strong>Critério:</strong> Cálculo espacial trigonométrico direto no servidor, filtrando e ordenando profissionais por proximidade.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Na tela da cliente, rolar até 'Profissionais Próximas' ➔ Conferir as distâncias crescentes (0.8 km, 1.2 km...) e limite de 15km.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.switchRoleAndNavigate('cliente');">
+              👉 Auditar Profissionais no Raio de 15km
+            </button>
+          </div>
+
+          <!-- CTM-05 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-05: Alternância de Modalidade (Domicílio vs Salão)</strong>
+              <span class="badge badge-emerald">RF04</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Cliente • <strong>Critério:</strong> Filtro responsivo permitindo à cliente alternar instantaneamente entre atendimento em domicílio ou salão.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Clicar na pílula 'No Salão' ➔ Observar atualização dos cards ➔ Clicar em 'Em Domicílio' ➔ Verificar reatividade em tempo real.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.switchRoleAndNavigate('cliente');">
+              👉 Alternar Modalidade na Home da Cliente
+            </button>
+          </div>
+
+          <!-- CTM-06 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-06: Solicitação de Pronto Atendimento Imediato</strong>
+              <span class="badge badge-emerald">RF05</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Cliente • <strong>Critério:</strong> Enviar chamado sob demanda para profissional específica gerando atendimento 'Em Andamento' no banco.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Clicar em 'Chamar' no card de Clara Mendes ➔ Revisar valor e modalidade ➔ Clicar em '🚀 Confirmar Solicitação Imediata'.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); UI.openChamarModal(2);">
+              👉 Abrir Modal de Solicitação Imediata
+            </button>
+          </div>
+
+          <!-- CTM-07 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-07: Recepção e Gestão de Chamados pela Freelancer</strong>
+              <span class="badge badge-emerald">RF06</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Freelancer • <strong>Critério:</strong> Visualização do chamado ativo com cliente, previsão de chegada e histórico sincronizado na agenda.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Alternar para 'Freelancer' ➔ Inspecionar card de atendimento atual ➔ Acessar 'Agenda' no menu inferior para auditar registros.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.switchRoleAndNavigate('freelancer');">
+              👉 Ir para o Painel da Freelancer (#/freelancer/home)
+            </button>
+          </div>
+
+          <!-- CTM-08 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-08: Anúncio de Espaço Físico Ocioso pelo Salão</strong>
+              <span class="badge badge-emerald">RF07</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Salão Parceiro • <strong>Critério:</strong> Gestor publica cadeira ou maca ociosa definindo valor por hora, gravando na tabela 'espaco'.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Alternar para 'Salão Parceiro' ➔ Preencher 'Qual o espaço?' e 'Valor por Hora' ➔ Clicar em '+ Colocar na Rede'.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.switchRoleAndNavigate('salao');">
+              👉 Ir para o Painel do Salão Parceiro (#/salao/home)
+            </button>
+          </div>
+
+          <!-- CTM-09 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-09: Reserva de Espaço com Tolerância de 30 Minutos</strong>
+              <span class="badge badge-emerald">RF08 • RF09</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Freelancer • <strong>Critério:</strong> Listar espaços disponíveis ordenados por proximidade e reservar cadeira com cronômetro de 1.800 segundos.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Acessar <em>#/freelancer/espacos</em> ➔ Clicar em 'Reservar Cadeira' ➔ Confirmar ➔ Conferir cronômetro de tolerância e badge de reserva ativa.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.location.hash = '#/freelancer/espacos';">
+              👉 Ir para Reserva de Espaços Ociosos
+            </button>
+          </div>
+
+          <!-- CTM-10 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-10: Conclusão do Atendimento e Split Payment Automático</strong>
+              <span class="badge badge-emerald">RF10</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Freelancer / Sistema • <strong>Critério:</strong> Concluir serviço e acionar motor de divisão (10% plataforma, taxa salão e líquido profissional).
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Na tela da Freelancer, clicar em 'Finalizar Atendimento' ➔ Confirmar ➔ Conferir notificação com a partilha de Split Payment.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.switchRoleAndNavigate('freelancer');">
+              👉 Testar Finalização no Painel Freelancer
+            </button>
+          </div>
+
+          <!-- CTM-11 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-11: Auditoria da Carteira Financeira e Emissão de Recibo</strong>
+              <span class="badge badge-emerald">RF10</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Freelancer e Cliente • <strong>Critério:</strong> Extrato com decomposição do Split Payment e modal de recibo emitido com auditoria da transação.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Acessar <em>#/freelancer/carteira</em> ➔ Auditar os repasses ➔ Alternar para Cliente ➔ Acessar <em>#/cliente/historico</em> ➔ Clicar em 'Download Recibo'.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.location.hash = '#/freelancer/carteira';">
+              👉 Visualizar Carteira Virtual da Freelancer
+            </button>
+          </div>
+
+          <!-- CTM-12 -->
+          <div class="surface-card" style="padding: 12px;">
+            <div class="flex justify-between items-center" style="margin-bottom: 4px;">
+              <strong style="color: var(--primary-teal); font-size: 0.85rem;">CTM-12: Painel Administrativo de Métricas e Ajuste de Taxas</strong>
+              <span class="badge badge-emerald">RF01 • RF10</span>
+            </div>
+            <p class="text-xs text-secondary" style="margin-bottom: 6px;">
+              <strong>Ator:</strong> Administrador • <strong>Critério:</strong> Dashboard consolidando volume financeiro transacionado, total em comissões e ajuste da taxa da rede.
+            </p>
+            <div style="font-size: 0.75rem; background: var(--bg-subtle); padding: 6px 8px; border-radius: 4px; margin-bottom: 8px;">
+              <strong>Passo a passo:</strong> Alternar para 'Admin' ➔ Auditar indicadores agregados do banco ➔ Ajustar controle de taxa ➔ Atualizar no banco relacional.
+            </div>
+            <button class="btn btn-sm btn-ghost" style="font-size: 0.75rem; width: 100%; border: 1px solid var(--border-light);" onclick="UI.closeModal(); window.switchRoleAndNavigate('admin');">
+              👉 Abrir Painel do Administrador (#/admin)
+            </button>
+          </div>
+
+        </div>
+
+        <button type="button" class="btn btn-ghost" style="margin-top: 14px;" onclick="UI.closeModal()">
+          Fechar Roteiro
+        </button>
+      </div>
+    `);
   }
 };

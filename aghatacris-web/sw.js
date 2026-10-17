@@ -1,25 +1,7 @@
-// AGhataCris Service Worker
-const CACHE_NAME = 'aghatacris-v1';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  './css/variables.css',
-  './css/base.css',
-  './css/layout.css',
-  './css/components.css',
-  './css/views.css',
-  './js/state.js',
-  './js/router.js',
-  './js/app.js'
-];
+// AGhataCris Service Worker - v2
+const CACHE_NAME = 'aghatacris-v2';
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE).catch(() => Promise.resolve());
-    })
-  );
   self.skipWaiting();
 });
 
@@ -35,9 +17,23 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Não interceptar requisições para a API REST
+  if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // Network-First com fallback para cache
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).catch(() => cachedResponse);
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request))
   );
 });

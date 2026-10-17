@@ -22,7 +22,11 @@ class AtendimentoModel {
     valor_total,
     taxa_salao = 0.0,
     distancia_km = 1.2,
-    previsao_chegada = '09:45 AM'
+    previsao_chegada = '09:45 AM',
+    data_agendamento = null,
+    hora_agendamento = null,
+    duracao_minutos = 60,
+    servicos_adicionais_json = null
   }) {
     const total = parseFloat(valor_total);
     const taxaSalao = parseFloat(taxa_salao) || 0.0;
@@ -34,14 +38,17 @@ class AtendimentoModel {
     const taxaPlataforma = Math.round(total * (taxaPercent / 100) * 100) / 100;
     const valorLiquido = Math.round((total - taxaSalao - taxaPlataforma) * 100) / 100;
 
-    const dataFormatada = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const dataFormatada = hora_agendamento && data_agendamento
+      ? `${data_agendamento} às ${hora_agendamento}`
+      : new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
     const sql = `
       INSERT INTO atendimento (
         id_cliente, id_freelancer, id_espaco, servico, tipo,
         status, distancia_km, previsao_chegada, valor_total,
-        taxa_salao, taxa_plataforma, valor_liquido, data_atendimento
-      ) VALUES (?, ?, ?, ?, ?, 'Em Andamento', ?, ?, ?, ?, ?, ?, ?)
+        taxa_salao, taxa_plataforma, valor_liquido, data_atendimento,
+        data_agendamento, hora_agendamento, duracao_minutos, servicos_adicionais_json
+      ) VALUES (?, ?, ?, ?, ?, 'Em Andamento', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const result = db.run(sql, [
@@ -56,10 +63,32 @@ class AtendimentoModel {
       taxaSalao,
       taxaPlataforma,
       valorLiquido,
-      dataFormatada
+      dataFormatada,
+      data_agendamento,
+      hora_agendamento,
+      duracao_minutos,
+      typeof servicos_adicionais_json === 'string' ? servicos_adicionais_json : JSON.stringify(servicos_adicionais_json || [])
     ]);
 
     return this.findById(result.lastInsertRowid);
+  }
+
+  static getHorariosOcupados(id_freelancer, data) {
+    // Buscar agendamentos na data especificada para a freelancer/salão
+    // com status pendente, em andamento ou concluído
+    const sql = `
+      SELECT hora_agendamento, duracao_minutos, servico, data_atendimento
+      FROM atendimento
+      WHERE id_freelancer = ?
+        AND (data_agendamento = ? OR data_atendimento LIKE ?)
+        AND status IN ('Em Andamento', 'Agendado', 'Pendente')
+    `;
+    const rows = db.query(sql, [id_freelancer, data, `%${data}%`]);
+    return rows.map(r => ({
+      hora: r.hora_agendamento || '14:30',
+      duracao: r.duracao_minutos || 60,
+      servico: r.servico
+    }));
   }
 
   static findById(id) {

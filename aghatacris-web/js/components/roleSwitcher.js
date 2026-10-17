@@ -11,7 +11,7 @@ window.renderSimulatorToolbar = function() {
   toolbarEl.innerHTML = `
     <div class="toolbar-brand">
       <span class="brand-dot"></span>
-      <span>AGhataCris • Ambiente de Apresentação</span>
+      <span>AGhataCris • Apresentação</span>
     </div>
 
     <div class="toolbar-roles">
@@ -30,9 +30,6 @@ window.renderSimulatorToolbar = function() {
     </div>
 
     <div class="toolbar-actions">
-      <button class="tool-toggle-btn" onclick="UI.openIntegrationTestsModal()" style="background: rgba(13, 148, 136, 0.15); border-color: var(--primary-teal); color: var(--primary-teal); font-weight: 700;">
-        🧪 Testes de Integração
-      </button>
       <button class="tool-toggle-btn" onclick="window.location.hash = '#/login'">
         🔑 Login
       </button>

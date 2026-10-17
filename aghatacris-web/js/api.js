@@ -48,6 +48,13 @@ window.API = {
     });
   },
 
+  async verifyPassword(email, senha, id_usuario) {
+    return this.request('/auth/verificar-senha', {
+      method: 'POST',
+      body: JSON.stringify({ email, senha, id_usuario })
+    });
+  },
+
   async getMe(id) {
     return this.request(`/auth/me?id_usuario=${id || 1}`);
   },
@@ -62,6 +69,13 @@ window.API = {
   async listUsers(params = {}) {
     const qs = new URLSearchParams(params).toString();
     return this.request(`/usuarios?${qs}`);
+  },
+
+  async updateUser(userId, data) {
+    return this.request(`/usuarios/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
   },
 
   // Profissionais com cálculo geográfico Haversine (RF03, RF04, RNF01)
@@ -113,6 +127,43 @@ window.API = {
     return this.request(`/atendimentos/${idAtendimento}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status })
+    });
+  },
+
+  // Horários ocupados para validação de conflito de agendamento
+  async getHorariosOcupados(idFreelancer, data) {
+    return this.request(`/agendamentos/ocupados?id_freelancer=${idFreelancer}&data=${data}`);
+  },
+
+  // Serviços Ofertados (Freelancer & Salão)
+  async listServicos(idUsuario) {
+    const qs = idUsuario ? `?id_usuario=${idUsuario}` : '';
+    return this.request(`/servicos${qs}`);
+  },
+
+  async createServico(servicoData) {
+    return this.request('/servicos', {
+      method: 'POST',
+      body: JSON.stringify(servicoData)
+    });
+  },
+
+  async deleteServico(idServico, idUsuario) {
+    return this.request(`/servicos/${idServico}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ id_usuario: idUsuario })
+    });
+  },
+
+  // Formas de Pagamento
+  async getPagamentos(idUsuario) {
+    return this.request(`/pagamentos?id_usuario=${idUsuario}`);
+  },
+
+  async savePagamento(pagamentoData) {
+    return this.request('/pagamentos', {
+      method: 'POST',
+      body: JSON.stringify(pagamentoData)
     });
   },
 

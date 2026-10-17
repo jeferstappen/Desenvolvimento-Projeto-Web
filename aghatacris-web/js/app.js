@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial Route Render
   if (!window.location.hash) {
     window.location.hash = '#/cliente/home';
-  } else {
-    window.router.handleRouteChange();
   }
+  window.router.handleRouteChange();
 });

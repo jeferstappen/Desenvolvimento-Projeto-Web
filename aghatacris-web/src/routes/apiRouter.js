@@ -9,6 +9,8 @@ const {
   ProfissionalController,
   EspacoController,
   AtendimentoController,
+  ServicoController,
+  PagamentoController,
   AdminController
 } = require('../controllers/apiControllers');
 
@@ -100,6 +102,10 @@ async function handleApiRequest(req, res) {
       await AuthController.getMe(req, res);
       return true;
     }
+    if (pathname === '/api/auth/verificar-senha' && method === 'POST') {
+      await AuthController.verifyPassword(req, res);
+      return true;
+    }
 
     // -------------------------------------------------------------
     // Profissionais & Busca Espacial Radar 15km (RF03, RF04, RNF01)
@@ -135,6 +141,11 @@ async function handleApiRequest(req, res) {
     if (userDetailMatch && method === 'GET') {
       req.params.id = parseInt(userDetailMatch[1]);
       await UsuarioController.getById(req, res);
+      return true;
+    }
+    if (userDetailMatch && (method === 'PUT' || method === 'POST')) {
+      req.params.id = parseInt(userDetailMatch[1]);
+      await UsuarioController.update(req, res);
       return true;
     }
 
@@ -188,6 +199,10 @@ async function handleApiRequest(req, res) {
       await AtendimentoController.create(req, res);
       return true;
     }
+    if (pathname === '/api/agendamentos/ocupados' && method === 'GET') {
+      await AtendimentoController.getHorariosOcupados(req, res);
+      return true;
+    }
 
     const atendimentoStatusMatch = pathname.match(/^\/api\/atendimentos\/(\d+)\/status$/);
     if (atendimentoStatusMatch && (method === 'PUT' || method === 'POST')) {
@@ -200,6 +215,37 @@ async function handleApiRequest(req, res) {
     if (atendimentoDetailMatch && method === 'GET') {
       req.params.id = parseInt(atendimentoDetailMatch[1]);
       await AtendimentoController.getById(req, res);
+      return true;
+    }
+
+    // -------------------------------------------------------------
+    // Serviços Ofertados (Freelancer & Salão)
+    // -------------------------------------------------------------
+    if (pathname === '/api/servicos' && method === 'GET') {
+      await ServicoController.list(req, res);
+      return true;
+    }
+    if (pathname === '/api/servicos' && method === 'POST') {
+      await ServicoController.create(req, res);
+      return true;
+    }
+
+    const servicoDetailMatch = pathname.match(/^\/api\/servicos\/(\d+)$/);
+    if (servicoDetailMatch && method === 'DELETE') {
+      req.params.id = parseInt(servicoDetailMatch[1]);
+      await ServicoController.delete(req, res);
+      return true;
+    }
+
+    // -------------------------------------------------------------
+    // Formas de Pagamento (Cliente, Freelancer, Salão)
+    // -------------------------------------------------------------
+    if (pathname === '/api/pagamentos' && method === 'GET') {
+      await PagamentoController.getByUsuario(req, res);
+      return true;
+    }
+    if (pathname === '/api/pagamentos' && method === 'POST') {
+      await PagamentoController.save(req, res);
       return true;
     }
 

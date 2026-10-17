@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS usuario (
     email VARCHAR(150) NOT NULL UNIQUE,
     senha_hash VARCHAR(255) NOT NULL,
     tipo_perfil VARCHAR(50) NOT NULL CHECK(tipo_perfil IN ('Cliente', 'Freelancer', 'Salao', 'Administrador')),
+    cpf VARCHAR(14) NULL,
+    cnpj VARCHAR(18) NULL,
     avatar VARCHAR(255) DEFAULT 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     especialidade VARCHAR(150) NULL,
     avaliacao DECIMAL(2, 1) DEFAULT 5.0,
@@ -88,6 +90,32 @@ CREATE TABLE IF NOT EXISTS configuracao_plataforma (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabela: servico_ofertado
+-- Catálogo de procedimentos e serviços ofertados por freelancers e salões
+CREATE TABLE IF NOT EXISTS servico_ofertado (
+    id_servico INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_usuario INTEGER NOT NULL,
+    nome VARCHAR(150) NOT NULL,
+    descricao TEXT NULL,
+    preco DECIMAL(10, 2) NOT NULL,
+    duracao_minutos INTEGER NOT NULL DEFAULT 60,
+    ativo INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
+);
+
+-- Tabela: forma_pagamento_usuario
+-- Armazena métodos de pagamento (cartão para cliente, PIX/conta para freelancer, conta para salão)
+CREATE TABLE IF NOT EXISTS forma_pagamento_usuario (
+    id_pagamento INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_usuario INTEGER NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    dados_json TEXT NOT NULL,
+    is_preferencial INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
+);
+
 -- Índices para otimização de consultas espaciais e relacionais
 CREATE INDEX IF NOT EXISTS idx_usuario_perfil ON usuario(tipo_perfil);
 CREATE INDEX IF NOT EXISTS idx_usuario_coords ON usuario(latitude, longitude);
@@ -96,3 +124,4 @@ CREATE INDEX IF NOT EXISTS idx_espaco_status ON espaco(status);
 CREATE INDEX IF NOT EXISTS idx_atendimento_cliente ON atendimento(id_cliente);
 CREATE INDEX IF NOT EXISTS idx_atendimento_freelancer ON atendimento(id_freelancer);
 CREATE INDEX IF NOT EXISTS idx_atendimento_status ON atendimento(status);
+CREATE INDEX IF NOT EXISTS idx_servico_usuario ON servico_ofertado(id_usuario);

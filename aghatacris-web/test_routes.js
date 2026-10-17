@@ -27,6 +27,7 @@ const routesToTest = [
   '/js/views/freelancerEspacosView.js',
   '/js/views/salaoHomeView.js',
   '/js/views/perfilView.js',
+  '/js/views/editarPerfilView.js',
   '/js/views/adminView.js',
   '/js/app.js',
   '/api/health',
@@ -40,6 +41,10 @@ async function runTests() {
   console.log('\n--- Iniciando Testes de Integridade de Rotas, Arquivos e Endpoints REST ---');
   let passCount = 0;
   let failCount = 0;
+
+  if (!server.listening) {
+    await new Promise((resolve) => server.listen(3000, resolve));
+  }
 
   // Aguardar 200ms para estabilização
   await new Promise(r => setTimeout(r, 200));

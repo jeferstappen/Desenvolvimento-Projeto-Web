@@ -175,6 +175,9 @@ async function runAllTests() {
 
   // Iniciar servidor temporário se necessário ou conectar no localhost:3000
   const server = require('./server');
+  if (!server.listening) {
+    await new Promise((resolve) => server.listen(3000, resolve));
+  }
 
   // Aguardar 300ms para estabilização
   await new Promise(r => setTimeout(r, 300));
@@ -210,6 +213,32 @@ async function runAllTests() {
       email: 'isabela.santos@email.com'
     });
     assert(resLogin.status === 200 && resLogin.data.success, 'POST /api/auth/login -> 200 OK (RF01)');
+
+    // Verificar Senha Correta
+    const resPassOk = await request({
+      hostname: 'localhost',
+      port: 3000,
+      path: '/api/auth/verificar-senha',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    }, {
+      email: 'isabela.santos@email.com',
+      senha: '12345678'
+    });
+    assert(resPassOk.status === 200 && resPassOk.data.success, 'POST /api/auth/verificar-senha -> 200 OK com senha correta');
+
+    // Verificar Senha Incorreta
+    const resPassFail = await request({
+      hostname: 'localhost',
+      port: 3000,
+      path: '/api/auth/verificar-senha',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    }, {
+      email: 'isabela.santos@email.com',
+      senha: 'senhaerrada'
+    });
+    assert(resPassFail.status === 400 && !resPassFail.data.success, 'POST /api/auth/verificar-senha -> 400 com senha incorreta');
 
     // Profissionais Radar
     const resPros = await request({

@@ -1,24 +1,80 @@
 /**
- * AGhataCris - Cliente Home View (Descoberta & Mapa)
- * Corresponds to Figura 3 (Visão da Cliente: Tela Inicial de Mapa e Descoberta)
+ * AGhataCris - Cliente Home View (Descoberta & Mapa com Profissionais e Salões Parceiros)
+ * Corresponde à Figura 3 (Visão da Cliente: Tela Inicial de Mapa e Descoberta)
  */
 
 window.renderClienteHomeView = function() {
   const state = window.appState.getState();
-  const modalidade = state.filtros.modalidade;
+  const modalidade = state.filtros.modalidade || 'todos';
 
-  // Filter professionals
-  let pros = state.profissionais;
+  // 1. Obter profissionais e salões
+  let allPros = (state.profissionais && state.profissionais.length > 0)
+    ? state.profissionais
+    : [
+        {
+          id_usuario: 101,
+          nome_completo: 'Clara Mendes',
+          especialidade: 'Design de Sobrancelhas',
+          avaliacao: 4.8,
+          distanciaKm: 0.8,
+          precoEstimado: 75.00,
+          avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+          modalidade: 'Ambos'
+        },
+        {
+          id_usuario: 102,
+          nome_completo: 'Bia Oliveira',
+          especialidade: 'Maquiagem Social',
+          avaliacao: 5.0,
+          distanciaKm: 1.4,
+          precoEstimado: 180.00,
+          avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+          modalidade: 'Domicilio'
+        },
+        {
+          id_usuario: 103,
+          nome_completo: 'Juliana Costa',
+          especialidade: 'Manicure Gel & Nail Art',
+          avaliacao: 5.0,
+          distanciaKm: 2.1,
+          precoEstimado: 85.00,
+          avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80',
+          modalidade: 'Salao'
+        },
+        {
+          id_usuario: 104,
+          nome_completo: 'Beatriz Ramos',
+          especialidade: 'Hair Stylist & Coloração',
+          avaliacao: 5.0,
+          distanciaKm: 3.5,
+          precoEstimado: 220.00,
+          avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=150&auto=format&fit=crop&q=80',
+          modalidade: 'Ambos'
+        }
+      ];
+
+  const saloes = window.getSaloesList ? window.getSaloesList() : [];
+
+  // Filtragem por modalidade
+  let prosExibidas = allPros;
   if (modalidade === 'domicilio') {
-    pros = pros.filter(p => p.modalidade === 'Domicilio' || p.modalidade === 'Ambos');
+    prosExibidas = allPros.filter(p => p.modalidade === 'Domicilio' || p.modalidade === 'Ambos');
   } else if (modalidade === 'salao') {
-    pros = pros.filter(p => p.modalidade === 'Salao' || p.modalidade === 'Ambos');
+    prosExibidas = allPros.filter(p => p.modalidade === 'Salao' || p.modalidade === 'Ambos');
   }
 
+  // Filtragem por busca
   if (state.filtros.busca) {
     const q = state.filtros.busca.toLowerCase();
-    pros = pros.filter(p => p.nome_completo.toLowerCase().includes(q) || p.especialidade.toLowerCase().includes(q));
+    prosExibidas = prosExibidas.filter(p => 
+      (p.nome_completo && p.nome_completo.toLowerCase().includes(q)) || 
+      (p.especialidade && p.especialidade.toLowerCase().includes(q))
+    );
   }
+
+  const countDomicilio = allPros.filter(p => p.modalidade === 'Domicilio' || p.modalidade === 'Ambos').length;
+  const countSalao = saloes.length + allPros.filter(p => p.modalidade === 'Salao' || p.modalidade === 'Ambos').length;
+  const countTodos = allPros.length + saloes.length;
 
   return `
     <div class="client-map-view animate-fade-in">
@@ -26,18 +82,18 @@ window.renderClienteHomeView = function() {
       <div class="map-header-floating">
         <div class="map-search-bar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary-teal)" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" id="map-search-input" value="${state.filtros.busca}" placeholder="Olá, Cliente! Qual serviço você precisa?" oninput="window.handleSearchFilter(this.value)" />
+          <input type="text" id="map-search-input" value="${state.filtros.busca || ''}" placeholder="Qual serviço ou salão você procura?" oninput="window.handleSearchFilter(this.value)" />
         </div>
 
         <div class="filter-pills-bar">
           <button class="filter-pill ${modalidade === 'todos' ? 'active' : ''}" onclick="window.handleModalidadeFilter('todos')">
-            ✨ Todos (${state.profissionais.length})
+            ✨ Todos (${countTodos})
           </button>
           <button class="filter-pill ${modalidade === 'domicilio' ? 'active' : ''}" onclick="window.handleModalidadeFilter('domicilio')">
-            🏠 Em Domicílio
+            🏠 Em Domicílio (${countDomicilio})
           </button>
           <button class="filter-pill ${modalidade === 'salao' ? 'active' : ''}" onclick="window.handleModalidadeFilter('salao')">
-            🏢 No Salão
+            🏢 No Salão (${countSalao})
           </button>
         </div>
       </div>
@@ -47,42 +103,129 @@ window.renderClienteHomeView = function() {
         <div id="leaflet-map"></div>
       </div>
 
-      <!-- Bottom Sheet with Nearby Pros -->
+      <!-- Bottom Sheet with Nearby Pros & Salons -->
       <div class="map-bottom-sheet">
         <div class="modal-handle" style="margin-bottom: 8px;"></div>
-        <div class="sheet-header-title">
-          <div>
-            <h3 class="text-base font-extrabold text-primary">Profissionais Próximas</h3>
-            <p class="text-xs text-muted">Raio de 15km • Pronto Atendimento</p>
+        
+        ${modalidade === 'salao' ? `
+          <!-- Visão Focada em Salões Parceiros -->
+          <div class="sheet-header-title">
+            <div>
+              <h3 class="text-base font-extrabold text-primary">Salões Parceiros Credenciados</h3>
+              <p class="text-xs text-muted">Lei nº 13.352 • Infraestrutura Próxima para Pronto Atendimento</p>
+            </div>
+            <span class="badge badge-teal">🏢 ${saloes.length} Salões</span>
           </div>
-          <span class="badge badge-emerald">GPS Ativo</span>
-        </div>
 
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+            ${saloes.map(salao => `
+              <div class="surface-card" style="padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer;" onclick="UI.openSalaoModal(${salao.id_usuario})">
+                <div class="flex gap-3 items-center">
+                  <img src="${salao.avatar}" alt="${salao.nome_completo}" style="width: 72px; height: 72px; border-radius: var(--radius-sm); object-fit: cover; border: 1px solid var(--border-light);" />
+                  <div style="flex: 1;">
+                    <div class="flex justify-between items-start">
+                      <strong style="font-size: 0.95rem; color: var(--text-primary);">${salao.nome_completo}</strong>
+                      <span class="badge badge-emerald" style="font-size: 0.75rem;">★ ${salao.avaliacao}</span>
+                    </div>
+                    <div class="text-xs text-secondary" style="margin: 2px 0;">${salao.especialidade}</div>
+                    <div class="flex items-center gap-2 text-xs text-muted">
+                      <span>📍 ${salao.distanciaKm} km de você</span>
+                      <span>•</span>
+                      <span class="text-teal font-bold">${salao.espacosDisponiveis.length} espaços livres</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                  <button class="btn btn-sm btn-primary" style="flex: 1; font-size: 0.75rem;" onclick="event.stopPropagation(); UI.openSalaoModal(${salao.id_usuario})">
+                    🏢 Ver Espaços e Agendar
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="sheet-header-title" style="margin-top: 10px;">
+            <div>
+              <h4 class="text-sm font-bold text-primary">Profissionais que Atendem em Salão</h4>
+              <p class="text-xs text-muted">Profissionais autônomas prontas para atendimento no salão</p>
+            </div>
+          </div>
+        ` : ''}
+
+        ${modalidade === 'todos' ? `
+          <!-- Visão Todos: Destaque de Profissionais e Salões -->
+          <div class="sheet-header-title">
+            <div>
+              <h3 class="text-base font-extrabold text-primary">Profissionais Disponíveis</h3>
+              <p class="text-xs text-muted">Raio de 15km • Pronto Atendimento em Tempo Real</p>
+            </div>
+            <span class="badge badge-emerald">GPS Ativo</span>
+          </div>
+        ` : ''}
+
+        ${modalidade === 'domicilio' ? `
+          <div class="sheet-header-title">
+            <div>
+              <h3 class="text-base font-extrabold text-primary">Atendimento em Domicílio</h3>
+              <p class="text-xs text-muted">Profissionais que realizam o serviço na sua residência</p>
+            </div>
+            <span class="badge badge-teal">🏠 Domicílio</span>
+          </div>
+        ` : ''}
+
+        <!-- Lista de Profissionais -->
         <div class="pros-list">
-          ${pros.map(pro => `
-            <div class="pro-card">
+          ${prosExibidas.map(pro => `
+            <div class="pro-card" style="cursor: pointer;" onclick="UI.openChamarModal(${pro.id_usuario})">
               <img src="${pro.avatar}" alt="${pro.nome_completo}" class="pro-avatar" />
               <div class="pro-info">
                 <div class="pro-name">${pro.nome_completo}</div>
-                <div class="pro-specialty">${pro.especialidade}</div>
+                <div class="pro-specialty">${pro.especialidade || 'Estética & Beleza'}</div>
                 <div class="pro-meta">
-                  <span class="pro-rating">★ ${pro.avaliacao.toFixed(1)}</span>
+                  <span class="pro-rating">★ ${parseFloat(pro.avaliacao || 5).toFixed(1)}</span>
                   <span class="pro-distance">📍 ${pro.distanciaKm} km</span>
                   <span class="text-xs font-bold text-teal">A partir de R$ ${pro.precoEstimado.toFixed(0)}</span>
                 </div>
               </div>
-              <button class="btn btn-primary btn-sm" onclick="UI.openChamarModal(${pro.id_usuario})">
-                Chamar
+              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); UI.openChamarModal(${pro.id_usuario})">
+                Agendar
               </button>
             </div>
           `).join('')}
 
-          ${pros.length === 0 ? `
+          ${prosExibidas.length === 0 ? `
             <div class="text-center" style="padding: 24px; color: var(--text-muted);">
               Nenhum profissional encontrado para os filtros selecionados.
             </div>
           ` : ''}
         </div>
+
+        ${modalidade === 'todos' ? `
+          <!-- Seção de Salões Parceiros no modo 'Todos' -->
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light);">
+            <div class="sheet-header-title">
+              <div>
+                <h3 class="text-base font-extrabold text-primary">🏢 Salões Parceiros Credenciados</h3>
+                <p class="text-xs text-muted">Espaços físicos verificados com cadeiras livres para atendimento</p>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              ${saloes.map(salao => `
+                <div class="surface-card" style="padding: 10px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); cursor: pointer;" onclick="UI.openSalaoModal(${salao.id_usuario})">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <strong style="font-size: 0.9rem; color: var(--text-primary);">${salao.nome_completo}</strong>
+                      <div class="text-xs text-muted">📍 ${salao.endereco} • ${salao.distanciaKm} km</div>
+                    </div>
+                    <span class="badge badge-teal" style="font-size: 0.7rem;">Ver Espaço ›</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
       </div>
     </div>
   `;
@@ -95,6 +238,7 @@ window.handleModalidadeFilter = function(modalidade) {
 
 window.handleSearchFilter = function(q) {
   window.appState.setSearchQuery(q);
+  window.router.renderCurrentRoute();
 };
 
 window.initMapIfPresent = function() {
@@ -102,7 +246,6 @@ window.initMapIfPresent = function() {
   if (!mapContainer) return;
 
   if (typeof L === 'undefined') {
-    // If CDN is offline, render visual mock map
     mapContainer.innerHTML = `
       <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%); display: flex; align-items: center; justify-content: center; color: #1E293B; font-weight: 700;">
         📍 Mapa de Geolocalização Integrado (Raio de 15km)
@@ -111,7 +254,6 @@ window.initMapIfPresent = function() {
     return;
   }
 
-  // If already initialized
   if (window.activeLeafletMap) {
     window.activeLeafletMap.remove();
   }
@@ -125,7 +267,7 @@ window.initMapIfPresent = function() {
     maxZoom: 19
   }).addTo(map);
 
-  // User pin (Teal circle pulse)
+  // Pin do Cliente
   const userIcon = L.divIcon({
     className: 'custom-user-pin',
     html: `<div style="width: 16px; height: 16px; background: #0D9488; border: 3px solid #FFFFFF; border-radius: 50%; box-shadow: 0 0 10px rgba(13,148,136,0.8);"></div>`,
@@ -135,25 +277,26 @@ window.initMapIfPresent = function() {
 
   L.marker([-23.561684, -46.655981], { icon: userIcon })
     .addTo(map)
-    .bindPopup('<b>Você está aqui</b><br>Buscando profissionais...')
+    .bindPopup('<b>Você está aqui</b><br>Raio de busca ativo')
     .openPopup();
 
-  // 15km Radius Circle
+  // Círculo de 15km / radar visual
   L.circle([-23.561684, -46.655981], {
     color: '#0D9488',
     fillColor: '#0D9488',
-    fillOpacity: 0.1,
+    fillOpacity: 0.08,
     radius: 1200
   }).addTo(map);
 
-  // Professionals Pins
-  const pros = window.appState.getState().profissionais;
+  // Pins das Profissionais
+  const pros = window.appState.getState().profissionais || [];
   pros.forEach(pro => {
+    if (!pro.latitude || !pro.longitude) return;
     const proIcon = L.divIcon({
       className: 'custom-pro-pin',
       html: `
         <div style="background: #10B981; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); white-space: nowrap; cursor: pointer;">
-          ★ ${pro.avaliacao} ${pro.nome_completo.split(' ')[0]}
+          ★ ${parseFloat(pro.avaliacao || 5).toFixed(1)} ${pro.nome_completo.split(' ')[0]}
         </div>
       `,
       iconAnchor: [30, 15]
@@ -162,6 +305,26 @@ window.initMapIfPresent = function() {
     const marker = L.marker([pro.latitude, pro.longitude], { icon: proIcon }).addTo(map);
     marker.on('click', () => {
       UI.openChamarModal(pro.id_usuario);
+    });
+  });
+
+  // Pins dos Salões Parceiros Credenciados
+  const saloes = window.getSaloesList ? window.getSaloesList() : [];
+  saloes.forEach(salao => {
+    if (!salao.latitude || !salao.longitude) return;
+    const salaoIcon = L.divIcon({
+      className: 'custom-salao-pin',
+      html: `
+        <div style="background: #0284C7; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.25); white-space: nowrap; cursor: pointer;">
+          🏢 ${salao.nome_completo.split(' ')[0]}
+        </div>
+      `,
+      iconAnchor: [35, 15]
+    });
+
+    const marker = L.marker([salao.latitude, salao.longitude], { icon: salaoIcon }).addTo(map);
+    marker.on('click', () => {
+      UI.openSalaoModal(salao.id_usuario);
     });
   });
 

@@ -12,23 +12,23 @@ window.renderLoginView = function() {
           <p class="auth-subtitle">Bem-vindo(a) de volta!</p>
         </div>
 
-        <form onsubmit="event.preventDefault(); window.handleLoginSubmit();">
+        <form id="form-login" onsubmit="event.preventDefault(); window.handleLoginSubmit();">
           <div class="form-group">
             <label class="form-label">E-mail</label>
             <div class="input-with-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              <input type="email" id="login-email" value="isabela.santos@email.com" placeholder="seuemail@exemplo.com" required />
+              <input type="email" id="login-email" placeholder="seuemail@exemplo.com" required autocomplete="username" />
             </div>
           </div>
 
           <div class="form-group">
             <div class="flex justify-between items-center">
               <label class="form-label">Senha</label>
-              <a href="javascript:void(0)" onclick="UI.showToast('Link de recuperação enviado para seu e-mail', 'info')" class="text-xs text-muted">Esqueci minha senha</a>
+              <a href="javascript:void(0)" onclick="UI.showToast('Digite sua senha cadastrada ou use o Acesso Rápido', 'info')" class="text-xs text-muted">Esqueci minha senha</a>
             </div>
             <div class="input-with-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <input type="password" id="login-password" value="••••••••" placeholder="Sua senha secreta" required />
+              <input type="password" id="login-password" placeholder="Sua senha secreta" required autocomplete="current-password" />
             </div>
           </div>
 
@@ -38,11 +38,11 @@ window.renderLoginView = function() {
         </form>
 
         <div class="demo-account-pills">
-          <div class="demo-pills-title">🚀 Acesso Rápido para Avaliação</div>
+          <div class="demo-pills-title">🚀 Acesso Rápido para Demonstração</div>
           <div class="demo-pills-row">
-            <button class="demo-pill-btn" onclick="window.quickLoginAs('cliente')">👤 Cliente</button>
-            <button class="demo-pill-btn" onclick="window.quickLoginAs('freelancer')">💇‍♀️ Freelancer</button>
-            <button class="demo-pill-btn" onclick="window.quickLoginAs('salao')">🏢 Salão</button>
+            <button class="demo-pill-btn" onclick="window.quickFillLogin('isabela.santos@email.com', '12345678')">👤 Cliente</button>
+            <button class="demo-pill-btn" onclick="window.quickFillLogin('mariana.silva@beauty.com', '12345678')">💇‍♀️ Freelancer</button>
+            <button class="demo-pill-btn" onclick="window.quickFillLogin('contato@studioelegance.com.br', '12345678')">🏢 Salão</button>
           </div>
         </div>
       </div>
@@ -88,10 +88,22 @@ window.renderRegisterView = function() {
           </div>
         </div>
 
-        <form onsubmit="event.preventDefault(); window.handleRegisterSubmit();">
+        <form id="form-register" onsubmit="event.preventDefault(); window.handleRegisterSubmit();">
           <div class="form-group">
             <label class="form-label" id="label-register-name">Nome Completo</label>
             <input type="text" id="reg-name" placeholder="Ex: Maria Silva" required />
+          </div>
+
+          <!-- CPF (Cliente / Freelancer) -->
+          <div class="form-group" id="group-cpf">
+            <label class="form-label">CPF</label>
+            <input type="text" id="reg-cpf" placeholder="000.000.000-00" maxlength="14" oninput="window.maskCPF(this)" />
+          </div>
+
+          <!-- CNPJ (Salão Parceiro) -->
+          <div class="form-group" id="group-cnpj" style="display: none;">
+            <label class="form-label">CNPJ</label>
+            <input type="text" id="reg-cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="window.maskCNPJ(this)" />
           </div>
 
           <div class="form-group">
@@ -101,7 +113,7 @@ window.renderRegisterView = function() {
 
           <div class="form-group">
             <label class="form-label">Senha</label>
-            <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" required />
+            <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required />
           </div>
 
           <p class="text-xs text-muted" style="margin: 16px 0;">
@@ -126,77 +138,149 @@ window.selectedRegisterRole = 'cliente';
 window.selectRegisterRole = function(role, el) {
   window.selectedRegisterRole = role;
   document.querySelectorAll('#register-role-grid .role-card-option').forEach(card => card.classList.remove('selected'));
-  el.classList.add('selected');
+  if (el) el.classList.add('selected');
 
   const labelName = document.getElementById('label-register-name');
   if (labelName) {
-    labelName.textContent = role === 'salao' ? 'Razão Social ou Nome Fantasia' : 'Nome Completo';
+    labelName.textContent = role === 'salao' ? 'Nome do Salão' : 'Nome Completo';
   }
+
+  // Atualizar placeholder do campo nome
+  const nameInput = document.getElementById('reg-name');
+  if (nameInput) {
+    nameInput.placeholder = role === 'salao' ? 'Ex: Studio Elegance' : 'Ex: Maria Silva';
+  }
+
+  // Toggle CPF / CNPJ com display flex para manter layout padronizado de coluna
+  const groupCPF = document.getElementById('group-cpf');
+  const groupCNPJ = document.getElementById('group-cnpj');
+  if (groupCPF) groupCPF.style.display = role === 'salao' ? 'none' : 'flex';
+  if (groupCNPJ) groupCNPJ.style.display = role === 'salao' ? 'flex' : 'none';
+};
+
+window.quickFillLogin = function(email, pass) {
+  const emailInput = document.getElementById('login-email');
+  const passInput = document.getElementById('login-password');
+  if (emailInput) emailInput.value = email;
+  if (passInput) passInput.value = pass;
+  window.handleLoginSubmit();
 };
 
 window.handleLoginSubmit = async function() {
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
+  const emailInput = document.getElementById('login-email');
+  const passInput = document.getElementById('login-password');
+  if (!emailInput || !passInput) return;
+
+  const email = emailInput.value.trim();
+  const password = passInput.value;
+
+  if (!email) {
+    UI.showToast('Por favor, informe seu e-mail.', 'error');
+    return;
+  }
 
   try {
     if (window.API) {
       const res = await window.API.login(email, password);
       if (res && res.user) {
-        const role = res.user.tipo_perfil.toLowerCase() === 'administrador' ? 'admin' : res.user.tipo_perfil.toLowerCase();
-        window.appState.setRole(role);
-        window.appState.getState().currentUser = { ...res.user };
+        let role = (res.user.tipo_perfil || 'Cliente').toLowerCase();
+        if (role === 'administrador') role = 'admin';
+
+        window.appState.state.currentRole = role;
+        window.appState.state.currentUser = { ...res.user };
+        window.appState.state.userPasswords = window.appState.state.userPasswords || {};
+        if (password) window.appState.state.userPasswords[email.toLowerCase()] = password;
+        if (window.appState.state.rolesData[role]) {
+          window.appState.state.rolesData[role] = {
+            ...window.appState.state.rolesData[role],
+            ...res.user
+          };
+        }
         window.appState.saveState();
+
         UI.showToast(`Bem-vindo(a), ${res.user.nome_completo}!`, 'success');
         window.location.hash = `#/${role}/home`;
         return;
       }
     }
   } catch (err) {
-    console.warn('Login backend fallback:', err.message);
+    console.error('Erro no login:', err);
+    UI.showToast(err.message || 'E-mail ou senha incorretos.', 'error');
   }
-
-  UI.showToast(`Login realizado com sucesso!`, 'success');
-  window.location.hash = `#/${window.appState.getState().currentRole}/home`;
 };
 
 window.handleRegisterSubmit = async function() {
-  const name = document.getElementById('reg-name').value;
-  const email = document.getElementById('reg-email').value;
-  const password = document.getElementById('reg-password').value;
-  const role = window.selectedRegisterRole;
+  const nameInput = document.getElementById('reg-name');
+  const emailInput = document.getElementById('reg-email');
+  const passInput = document.getElementById('reg-password');
+  const cpfInput = document.getElementById('reg-cpf');
+  const cnpjInput = document.getElementById('reg-cnpj');
+
+  if (!nameInput || !emailInput || !passInput) return;
+
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  const password = passInput.value;
+  const role = window.selectedRegisterRole || 'cliente';
+  const cpf = cpfInput ? cpfInput.value.trim() : '';
+  const cnpj = cnpjInput ? cnpjInput.value.trim() : '';
+
+  if (!name || !email || !password) {
+    UI.showToast('Por favor, preencha todos os campos.', 'error');
+    return;
+  }
 
   try {
     if (window.API) {
+      const formattedRole = role === 'admin' ? 'Administrador' : (role === 'salao' ? 'Salao' : (role === 'freelancer' ? 'Freelancer' : 'Cliente'));
       const res = await window.API.register({
         nome_completo: name,
         email: email,
         senha: password,
-        tipo_perfil: role === 'admin' ? 'Administrador' : (role === 'salao' ? 'Salao' : (role === 'freelancer' ? 'Freelancer' : 'Cliente'))
+        tipo_perfil: formattedRole,
+        cpf: role !== 'salao' ? cpf : undefined,
+        cnpj: role === 'salao' ? cnpj : undefined
       });
+
       if (res && res.user) {
-        window.appState.setRole(role);
-        window.appState.getState().currentUser = { ...res.user };
+        // Conectar imediatamente com o usuário recém-criado
+        window.appState.state.currentRole = role;
+        window.appState.state.currentUser = { ...res.user };
+        window.appState.state.userPasswords = window.appState.state.userPasswords || {};
+        window.appState.state.userPasswords[email.toLowerCase()] = password;
+        if (window.appState.state.rolesData[role]) {
+          window.appState.state.rolesData[role] = {
+            ...window.appState.state.rolesData[role],
+            ...res.user
+          };
+        }
         window.appState.saveState();
-        UI.showToast(`Conta criada como ${role.toUpperCase()} no banco de dados!`, 'success');
+
+        UI.showToast(`Conta criada com sucesso! Bem-vindo(a), ${res.user.nome_completo}!`, 'success');
         window.location.hash = `#/${role}/home`;
         return;
       }
     }
   } catch (err) {
-    console.warn('Cadastro backend fallback:', err.message);
+    console.error('Erro no cadastro:', err);
+    UI.showToast(err.message || 'Erro ao realizar cadastro.', 'error');
   }
-
-  window.appState.setRole(role);
-  window.appState.getState().currentUser.nome_completo = name;
-  window.appState.getState().currentUser.email = email;
-  window.appState.saveState();
-
-  UI.showToast(`Conta criada como ${role.toUpperCase()} com sucesso!`, 'success');
-  window.location.hash = `#/${role}/home`;
 };
 
-window.quickLoginAs = function(role) {
-  window.appState.setRole(role);
-  window.location.hash = `#/${role}/home`;
-  UI.showToast(`Conectado como ${role.toUpperCase()}`, 'success');
+// Máscaras de CPF e CNPJ
+window.maskCPF = function(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 11);
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  input.value = v;
+};
+
+window.maskCNPJ = function(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 14);
+  v = v.replace(/(\d{2})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d)/, '$1/$2');
+  v = v.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  input.value = v;
 };

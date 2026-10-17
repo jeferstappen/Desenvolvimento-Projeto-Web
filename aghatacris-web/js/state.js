@@ -1,9 +1,9 @@
 /**
- * AGhataCris - Central State Management & REST API Sync (Sprint 2)
+ * AGhataCris - Central State Management & REST API Sync (Sprint 2 & 3)
  * Corresponde aos modelos relacionais: usuario, espaco, atendimento, transacao
  */
 
-const STORAGE_KEY = 'aghatacris_state_v2';
+const STORAGE_KEY = 'aghatacris_state_v5';
 
 const defaultState = {
   currentRole: 'cliente', // 'cliente' | 'freelancer' | 'salao' | 'admin'
@@ -16,6 +16,12 @@ const defaultState = {
     latitude: -23.561684,
     longitude: -46.655981,
     isOnline: true
+  },
+  userPasswords: {
+    'isabela.santos@email.com': '12345678',
+    'mariana.silva@beauty.com': '12345678',
+    'contato@studioelegance.com.br': '12345678',
+    'admin@aghatacris.com.br': '12345678'
   },
   rolesData: {
     cliente: {
@@ -38,12 +44,7 @@ const defaultState = {
       ganhosHoje: 150.00,
       avaliacao: 4.9,
       isOnline: true,
-      reservaAtiva: {
-        id_espaco: 1,
-        nome_salao: 'Studio Elegance Jardins',
-        tipo_espaco: 'Cadeira de Cabelo',
-        tempoRestanteSegundos: 1800 // 30 minutos
-      }
+      reservaAtiva: null
     },
     salao: {
       id_usuario: 3,
@@ -117,6 +118,35 @@ const defaultState = {
       modalidade: 'Ambos'
     }
   ],
+  // Salões Parceiros Credenciados (Lei do Salão Parceiro)
+  saloes: [
+    {
+      id_usuario: 3,
+      nome_completo: 'Studio Elegance Jardins',
+      especialidade: 'Cabelo, Manicure & Estética',
+      endereco: 'Al. Santos, 1200 - Jardins',
+      distanciaKm: 1.2,
+      avaliacao: 4.9,
+      totalEspacos: 4,
+      avatar: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300&auto=format&fit=crop&q=80',
+      espacosDisponiveis: ['Cadeira de Cabelo (R$ 25/h)', 'Maca de Estética (R$ 30/h)'],
+      latitude: -23.5645,
+      longitude: -46.6520
+    },
+    {
+      id_usuario: 4,
+      nome_completo: 'Belle Époque Paulista',
+      especialidade: 'Maquiagem & Penteados Premium',
+      endereco: 'Av. Paulista, 850 - Bela Vista',
+      distanciaKm: 2.8,
+      avaliacao: 4.8,
+      totalEspacos: 3,
+      avatar: 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=300&auto=format&fit=crop&q=80',
+      espacosDisponiveis: ['Bancada de Maquiagem (R$ 20/h)', 'Cadeira de Corte (R$ 35/h)'],
+      latitude: -23.5580,
+      longitude: -46.6590
+    }
+  ],
   // Espaços Ociosos em Salões Parceiros (RF07, RF08, RF09)
   espacos: [
     {
@@ -157,7 +187,8 @@ const defaultState = {
   atendimentos: [
     {
       id_atendimento: 1001,
-      cliente_nome: 'Mariana Silva',
+      id_freelancer: 2,
+      cliente_nome: 'Isabela Santos',
       freelancer_nome: 'Mariana Silva (Você)',
       servico: 'Maquiagem & Penteado',
       tipo: 'Domicílio',
@@ -167,7 +198,7 @@ const defaultState = {
       taxa_salao: 0.00,
       taxa_plataforma: 28.00,
       valor_liquido: 252.00,
-      status: 'Em Andamento',
+      status: 'Concluído',
       data: 'Hoje, 09:30'
     },
     {
@@ -181,20 +212,20 @@ const defaultState = {
       taxa_plataforma: 12.00,
       valor_liquido: 88.00,
       status: 'Concluído',
-      data: '15 Maio, 14:30'
+      data: '15 Mai, 14:30'
     },
     {
       id_atendimento: 1003,
       cliente_nome: 'Juliana Costa',
-      freelancer_nome: 'Juliana Costa',
+      freelancer_nome: 'Mariana Silva',
       servico: 'Manicure Gel & Nail Art',
-      tipo: 'No Salão',
+      tipo: 'Domicílio',
       valor_total: 85.00,
-      taxa_salao: 15.00,
+      taxa_salao: 0.00,
       taxa_plataforma: 8.50,
-      valor_liquido: 61.50,
+      valor_liquido: 76.50,
       status: 'Concluído',
-      data: '02 Maio, 10:00'
+      data: '02 Mai, 10:00'
     },
     {
       id_atendimento: 1004,
@@ -209,6 +240,65 @@ const defaultState = {
       status: 'Concluído',
       data: '18 Abr, 16:15'
     }
+  ],
+  // Formas de Pagamento cadastradas por perfil
+  formasPagamento: {
+    cliente: {
+      tipo: 'cartao_credito',
+      numero_mascarado: '•••• •••• •••• 4242',
+      titular: 'ISABELA SANTOS',
+      validade: '08/29',
+      bandeira: 'Mastercard'
+    },
+    freelancer: {
+      tipo: 'pix',
+      tipo_chave: 'CPF',
+      chave: '234.567.890-11',
+      titular: 'Mariana Silva',
+      banco: 'Banco Inter (077)',
+      agencia: '0001',
+      conta: '1234567-8'
+    },
+    salao: {
+      tipo: 'conta_corrente',
+      banco: 'Banco Itaú (341)',
+      agencia: '0124',
+      conta: '48291-5',
+      tipo_conta: 'Corrente',
+      titular: 'Studio Elegance Jardins EIRELI',
+      documento: '12.345.678/0001-90'
+    }
+  },
+  // Catálogo de Serviços Ofertados por Profissional / Salão
+  servicosOfertados: [
+    { id_servico: 1, id_usuario: 2, nome: 'Chapinha & Escova Modeladora', descricao: 'Alisamento térmico e escova com fixação duradoura e brilho intenso', preco: 80.00, duracao_minutos: 60 },
+    { id_servico: 2, id_usuario: 2, nome: 'Maquiagem Social Glam', descricao: 'Produção completa para festas e eventos com cílios inclusos', preco: 150.00, duracao_minutos: 60 },
+    { id_servico: 3, id_usuario: 2, nome: 'Penteado Preso ou Semi-preso', descricao: 'Penteados contemporâneos para convidadas e formandas', preco: 120.00, duracao_minutos: 45 },
+    { id_servico: 4, id_usuario: 2, nome: 'Corte & Hidratação Profunda', descricao: 'Corte personalizado e nutrição com produtos premium', preco: 110.00, duracao_minutos: 60 },
+
+    { id_servico: 5, id_usuario: 101, nome: 'Design de Sobrancelhas com Henna', descricao: 'Alinhamento com visagismo facial e henna', preco: 75.00, duracao_minutos: 45 },
+    { id_servico: 6, id_usuario: 101, nome: 'Micropigmentação Fio a Fio', descricao: 'Técnica hiper-realista para sobrancelhas perfeitas', preco: 280.00, duracao_minutos: 90 },
+    { id_servico: 7, id_usuario: 101, nome: 'Depilação Facial Egípcia', descricao: 'Remoção com linha 100% hipoalergênica', preco: 45.00, duracao_minutos: 30 },
+
+    { id_servico: 8, id_usuario: 102, nome: 'Maquiagem Social com Cílios', descricao: 'Make profissional com contorno e iluminação impecáveis', preco: 180.00, duracao_minutos: 60 },
+    { id_servico: 9, id_usuario: 102, nome: 'Maquiagem para Noivas / Madrinhas', descricao: 'Técnica blindada à prova d’água e alta durabilidade', preco: 250.00, duracao_minutos: 90 },
+
+    { id_servico: 10, id_usuario: 103, nome: 'Manicure em Gel & Nail Art', descricao: 'Esmaltação em gel de alta durabilidade com decorações', preco: 85.00, duracao_minutos: 60 },
+    { id_servico: 11, id_usuario: 103, nome: 'Alongamento de Unhas em Fibra', descricao: 'Estrutura resistente com acabamento fino e natural', preco: 150.00, duracao_minutos: 90 },
+    { id_servico: 12, id_usuario: 103, nome: 'Pedicure & Spa dos Pés', descricao: 'Esfoliação, hidratação profunda e cutilagem russa', preco: 70.00, duracao_minutos: 45 },
+
+    { id_servico: 13, id_usuario: 104, nome: 'Hair Stylist & Coloração Global', descricao: 'Coloração profissional com proteção da fibra capilar', preco: 220.00, duracao_minutos: 120 },
+    { id_servico: 14, id_usuario: 104, nome: 'Botox Capilar & Reconstrução', descricao: 'Redução de volume, eliminação de frizz e brilho', preco: 160.00, duracao_minutos: 90 },
+    { id_servico: 15, id_usuario: 104, nome: 'Escova Modelada com Babyliss', descricao: 'Ondas volumosas estilo capa de revista', preco: 90.00, duracao_minutos: 45 },
+
+    { id_servico: 16, id_usuario: 3, nome: 'Pacote Completo: Cabelo, Make & Unha', descricao: 'Experiência completa no salão com atendimento simultâneo de especialistas', preco: 290.00, duracao_minutos: 120 },
+    { id_servico: 17, id_usuario: 3, nome: 'Escova Progressiva Orgânica', descricao: 'Alisamento sem formol, fios maleáveis e brilho espelhado', preco: 200.00, duracao_minutos: 120 },
+    { id_servico: 18, id_usuario: 3, nome: 'Limpeza de Pele Profunda com Peeling', descricao: 'Higienização, extração de comedões e máscara de LED', preco: 180.00, duracao_minutos: 60 },
+    { id_servico: 19, id_usuario: 3, nome: 'Corte Feminino com Terapeuta Capilar', descricao: 'Análise do couro cabeludo, lavagem relaxante e corte', preco: 130.00, duracao_minutos: 60 },
+
+    { id_servico: 20, id_usuario: 4, nome: 'Produção Completa de Gala', descricao: 'Penteado exclusivo, maquiagem de alta definição e camarim VIP', preco: 380.00, duracao_minutos: 180 },
+    { id_servico: 21, id_usuario: 4, nome: 'Tratamento Reconstrutor Kérastase', descricao: 'Cronograma capilar intensivo com diagnóstico e vapor de ozônio', preco: 190.00, duracao_minutos: 60 },
+    { id_servico: 22, id_usuario: 4, nome: 'Manicure e Pedicure Express', descricao: 'Cuidado rápido e de alto padrão para sua rotina', preco: 90.00, duracao_minutos: 60 }
   ],
   // Filtros de busca no mapa
   filtros: {
@@ -229,7 +319,19 @@ class StateManager {
   loadState() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (!parsed.profissionais || parsed.profissionais.length === 0) {
+          parsed.profissionais = JSON.parse(JSON.stringify(defaultState.profissionais));
+        }
+        if (!parsed.saloes || parsed.saloes.length === 0) {
+          parsed.saloes = JSON.parse(JSON.stringify(defaultState.saloes));
+        }
+        if (parsed.filtros) {
+          parsed.filtros.busca = '';
+        }
+        return parsed;
+      }
     } catch (e) {
       console.warn('Erro ao carregar localStorage:', e);
     }
@@ -245,36 +347,67 @@ class StateManager {
     this.notify();
   }
 
+  logout() {
+    this.state.currentUser = null;
+    this.state.currentRole = 'cliente';
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {}
+    this.saveState();
+  }
+
   async syncWithBackend() {
     if (typeof window === 'undefined' || !window.API) return;
     try {
-      const [prosRes, espacosRes, atendsRes] = await Promise.all([
+      const userLat = (this.state.currentUser && this.state.currentUser.latitude) || -23.561684;
+      const userLon = (this.state.currentUser && this.state.currentUser.longitude) || -46.655981;
+
+      const [prosRes, espacosRes, atendsRes, saloesRes] = await Promise.all([
         window.API.getNearbyProfessionals({
-          latitude: this.state.currentUser.latitude,
-          longitude: this.state.currentUser.longitude,
+          latitude: userLat,
+          longitude: userLon,
           raio: this.state.filtros.raioKm,
           modalidade: this.state.filtros.modalidade,
           busca: this.state.filtros.busca
         }).catch(() => null),
         window.API.listEspacos({
-          latitude: this.state.currentUser.latitude,
-          longitude: this.state.currentUser.longitude
+          latitude: userLat,
+          longitude: userLon
         }).catch(() => null),
-        window.API.listAtendimentos().catch(() => null)
+        window.API.listAtendimentos().catch(() => null),
+        window.API.listUsers({ tipo_perfil: 'Salao' }).catch(() => null)
       ]);
 
-      if (prosRes && prosRes.profissionais) {
+      if (prosRes && prosRes.profissionais && prosRes.profissionais.length > 0) {
         this.state.profissionais = prosRes.profissionais.map(p => ({
           ...p,
           precoEstimado: p.preco_estimado || p.precoEstimado || 75.0,
-          distanciaKm: p.distanciaKm || 1.0
+          distanciaKm: p.distanciaKm !== undefined ? p.distanciaKm : 1.0
         }));
+      } else if (!this.state.profissionais || this.state.profissionais.length === 0) {
+        this.state.profissionais = JSON.parse(JSON.stringify(defaultState.profissionais));
       }
 
       if (espacosRes && espacosRes.espacos) {
         this.state.espacos = espacosRes.espacos.map(e => ({
           ...e,
           distanciaKm: e.distanciaKm || 1.2
+        }));
+      }
+
+      if (saloesRes && saloesRes.users && saloesRes.users.length > 0) {
+        this.state.saloes = saloesRes.users.map((s, idx) => ({
+          id_usuario: s.id_usuario,
+          nome_completo: s.nome_completo,
+          especialidade: s.especialidade || 'Salão Parceiro Credenciado',
+          endereco: idx === 0 ? 'Al. Santos, 1200 - Jardins' : 'Av. Paulista, 850 - Bela Vista',
+          distanciaKm: idx === 0 ? 1.2 : 2.8,
+          avaliacao: s.avaliacao || 4.9,
+          totalEspacos: 4,
+          avatar: s.avatar || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300&auto=format&fit=crop&q=80',
+          espacosDisponiveis: ['Cadeira de Cabelo (R$ 25/h)', 'Maca de Estética (R$ 30/h)'],
+          latitude: s.latitude || -23.5645,
+          longitude: s.longitude || -46.6520
         }));
       }
 
@@ -304,6 +437,11 @@ class StateManager {
       }
 
       this.saveState();
+
+      // Se estiver na tela da cliente, re-renderizar para exibir a lista atualizada
+      if (typeof window !== 'undefined' && window.router && window.location.hash.includes('/cliente/home')) {
+        window.router.renderCurrentRoute();
+      }
     } catch (e) {
       console.log('Sync backend offline/fallback ativo:', e.message);
     }
@@ -335,11 +473,13 @@ class StateManager {
   }
 
   async updateLocation(lat, lon) {
-    this.state.currentUser.latitude = lat;
-    this.state.currentUser.longitude = lon;
+    if (this.state.currentUser) {
+      this.state.currentUser.latitude = lat;
+      this.state.currentUser.longitude = lon;
+    }
     this.saveState();
 
-    if (window.API) {
+    if (window.API && this.state.currentUser) {
       try {
         await window.API.updateLocation(this.state.currentUser.id_usuario, lat, lon);
       } catch (e) {
@@ -350,10 +490,13 @@ class StateManager {
   }
 
   async adicionarEspaco(novoEspaco) {
+    const salaoId = (this.state.currentUser && this.state.currentUser.id_usuario) || 3;
+    const salaoNome = (this.state.currentUser && this.state.currentUser.nome_completo) || 'Studio Elegance Jardins';
+
     const espacoLocal = {
       id_espaco: Date.now(),
-      id_salao: this.state.currentUser.id_usuario,
-      nome_salao: this.state.currentUser.nome_completo,
+      id_salao: salaoId,
+      nome_salao: salaoNome,
       tipo_espaco: novoEspaco.tipo_espaco,
       preco_hora: parseFloat(novoEspaco.preco_hora),
       status: 'Disponível',
@@ -367,7 +510,7 @@ class StateManager {
     if (window.API) {
       try {
         const res = await window.API.createEspaco({
-          id_salao: this.state.currentUser.id_usuario,
+          id_salao: salaoId,
           tipo_espaco: novoEspaco.tipo_espaco,
           preco_hora: novoEspaco.preco_hora,
           foto: novoEspaco.foto
@@ -390,8 +533,9 @@ class StateManager {
 
       if (window.API) {
         try {
+          const proId = (this.state.currentUser && this.state.currentUser.id_usuario) || 2;
           if (espaco.status === 'Reservado') {
-            await window.API.reserveEspaco(id_espaco, this.state.currentUser.id_usuario);
+            await window.API.reserveEspaco(id_espaco, proId);
           } else {
             await window.API.toggleEspacoStatus(id_espaco);
           }
@@ -429,17 +573,143 @@ class StateManager {
 
   startCountdownTimer() {
     setInterval(() => {
-      if (this.state.rolesData.freelancer.reservaAtiva.tempoRestanteSegundos > 0) {
-        this.state.rolesData.freelancer.reservaAtiva.tempoRestanteSegundos--;
+      const reserva = this.state.rolesData &&
+                      this.state.rolesData.freelancer &&
+                      this.state.rolesData.freelancer.reservaAtiva;
+      if (reserva && reserva.tempoRestanteSegundos > 0) {
+        reserva.tempoRestanteSegundos--;
         const timerEl = document.getElementById('arrival-countdown');
         if (timerEl) {
-          const totalSecs = this.state.rolesData.freelancer.reservaAtiva.tempoRestanteSegundos;
+          const totalSecs = reserva.tempoRestanteSegundos;
           const mins = Math.floor(totalSecs / 60);
           const secs = totalSecs % 60;
           timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
       }
     }, 1000);
+  }
+
+  getServicosByUsuario(id_usuario) {
+    const list = (this.state.servicosOfertados || []).filter(s => s.id_usuario === id_usuario);
+    if (list.length > 0) return list;
+    return (defaultState.servicosOfertados || []).filter(s => s.id_usuario === id_usuario);
+  }
+
+  async adicionarServico({ id_usuario, nome, descricao, preco, duracao_minutos, senha }) {
+    if (!this.state.servicosOfertados) this.state.servicosOfertados = [];
+    const proId = id_usuario || (this.state.currentUser && this.state.currentUser.id_usuario) || 2;
+    const novo = {
+      id_servico: Date.now(),
+      id_usuario: proId,
+      nome,
+      descricao: descricao || '',
+      preco: parseFloat(preco),
+      duracao_minutos: parseInt(duracao_minutos, 10) || 60
+    };
+
+    if (window.API) {
+      try {
+        const res = await window.API.createServico({
+          id_usuario: proId,
+          nome,
+          descricao,
+          preco: novo.preco,
+          duracao_minutos: novo.duracao_minutos,
+          senha
+        });
+        if (res && res.servico) {
+          novo.id_servico = res.servico.id_servico;
+        }
+      } catch (e) {
+        throw e;
+      }
+    }
+
+    this.state.servicosOfertados.unshift(novo);
+    this.saveState();
+    return novo;
+  }
+
+  async removerServico(id_servico, id_usuario) {
+    if (this.state.servicosOfertados) {
+      this.state.servicosOfertados = this.state.servicosOfertados.filter(s => s.id_servico !== id_servico);
+      this.saveState();
+    }
+    if (window.API) {
+      try {
+        await window.API.deleteServico(id_servico, id_usuario);
+      } catch (e) {}
+    }
+  }
+
+  async salvarFormaPagamento(role, dados) {
+    if (!this.state.formasPagamento) {
+      this.state.formasPagamento = JSON.parse(JSON.stringify(defaultState.formasPagamento));
+    }
+    this.state.formasPagamento[role] = { ...this.state.formasPagamento[role], ...dados };
+    this.saveState();
+
+    if (window.API && this.state.currentUser) {
+      try {
+        await window.API.savePagamento({
+          id_usuario: this.state.currentUser.id_usuario,
+          tipo: dados.tipo,
+          dados: dados
+        });
+      } catch (e) {
+        console.warn('Erro ao salvar pagamento no backend:', e);
+      }
+    }
+  }
+
+  async criarAgendamento(dados) {
+    const novoAtendimento = {
+      id_atendimento: Date.now(),
+      id_cliente: dados.id_cliente,
+      id_freelancer: dados.id_freelancer,
+      cliente_nome: (this.state.currentUser && this.state.currentUser.nome_completo) || 'Cliente',
+      freelancer_nome: dados.freelancer_nome,
+      servico: dados.servico,
+      tipo: dados.tipo || 'No Salão',
+      valor_total: parseFloat(dados.valor_total),
+      taxa_salao: parseFloat(dados.taxa_salao || 0),
+      taxa_plataforma: Math.round(dados.valor_total * 0.10 * 100) / 100,
+      valor_liquido: Math.round((dados.valor_total - (dados.taxa_salao || 0) - (dados.valor_total * 0.10)) * 100) / 100,
+      status: 'Em Andamento',
+      data: `${dados.data_agendamento} às ${dados.hora_agendamento}`,
+      data_agendamento: dados.data_agendamento,
+      hora_agendamento: dados.hora_agendamento,
+      duracao_minutos: dados.duracao_minutos,
+      distanciaKm: 1.2
+    };
+
+    if (window.API) {
+      try {
+        const res = await window.API.createAtendimento({
+          id_cliente: dados.id_cliente,
+          id_freelancer: dados.id_freelancer,
+          id_espaco: dados.id_espaco || null,
+          servico: dados.servico,
+          tipo: dados.tipo || 'No Salão',
+          valor_total: dados.valor_total,
+          taxa_salao: dados.taxa_salao || 0,
+          distancia_km: 1.2,
+          data_agendamento: dados.data_agendamento,
+          hora_agendamento: dados.hora_agendamento,
+          duracao_minutos: dados.duracao_minutos,
+          servicos_adicionais_json: dados.servicos_adicionais
+        });
+        if (res && res.atendimento) {
+          novoAtendimento.id_atendimento = res.atendimento.id_atendimento;
+        }
+      } catch (e) {
+        console.warn('Erro ao registrar agendamento no backend:', e);
+      }
+    }
+
+    this.state.atendimentos.unshift(novoAtendimento);
+    this.saveState();
+    return novoAtendimento;
   }
 
   subscribe(listener) {
@@ -455,3 +725,11 @@ class StateManager {
 }
 
 window.appState = new StateManager();
+
+window.getSaloesList = function() {
+  const state = window.appState.getState();
+  if (state.saloes && state.saloes.length > 0) {
+    return state.saloes;
+  }
+  return defaultState.saloes;
+};

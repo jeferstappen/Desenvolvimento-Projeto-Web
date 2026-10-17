@@ -27,6 +27,10 @@ window.renderHeader = function() {
     `;
   }
 
+  const userAvatar = (state.currentUser && state.currentUser.avatar) 
+    || (state.rolesData[state.currentRole] && state.rolesData[state.currentRole].avatar) 
+    || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+
   headerEl.innerHTML = `
     <div class="brand-title" onclick="window.location.hash = '#/' + window.appState.getState().currentRole + '/home'" style="cursor: pointer;">
       <span>AGhataCris</span>
@@ -36,7 +40,7 @@ window.renderHeader = function() {
     <div class="header-user-actions">
       ${centerWidget}
       <button class="header-avatar-btn" onclick="window.location.hash = '#/perfil'" title="Meu Perfil">
-        <img src="${state.currentUser.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" alt="Avatar" />
+        <img src="${userAvatar}" alt="Avatar" />
       </button>
     </div>
   `;

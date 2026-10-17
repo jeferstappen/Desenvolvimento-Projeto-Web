@@ -1,11 +1,23 @@
 /**
  * AGhataCris - Universal Perfil & Configurações View
  * Corresponds to Figura 10 (Visão Geral: Configurações de Perfil de Usuário)
+ * Inclui modal de edição de dados cadastrais (sem CPF/CNPJ - imutáveis)
  */
 
 window.renderPerfilView = function() {
   const state = window.appState.getState();
-  const user = state.currentUser;
+  const user = state.currentUser || (state.rolesData && state.rolesData[state.currentRole]) || {
+    nome_completo: 'Usuário Convidado',
+    email: 'nao.autenticado@aghatacris.com.br',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+    tipo_perfil: 'Cliente',
+    badge: 'Membro Novo',
+    servicosRealizados: 0
+  };
+
+  const role = state.currentRole;
+  const isFreelancer = role === 'freelancer';
+  const isSalao = role === 'salao';
 
   return `
     <div class="view-content-padded animate-fade-in">
@@ -23,7 +35,7 @@ window.renderPerfilView = function() {
 
         <div class="profile-badges-row">
           <div class="badge badge-teal" style="padding: 6px 12px;">
-            ★ Fidelidade: <strong>${user.badge || 'Membro Ouro'}</strong>
+            ★ Perfil: <strong>${user.tipo_perfil || state.currentRole.toUpperCase()}</strong>
           </div>
           <div class="badge badge-emerald" style="padding: 6px 12px;">
             ✨ <strong>${user.servicosRealizados || 12}</strong> serviços
@@ -33,15 +45,15 @@ window.renderPerfilView = function() {
 
       <!-- Settings Menu List -->
       <div class="settings-menu-list">
-        <div class="settings-menu-item" onclick="UI.showToast('Abrindo edição de dados cadastrais', 'info')">
+        <div class="settings-menu-item" onclick="window.location.hash = '#/perfil/editar'" style="cursor: pointer;">
           <div class="settings-item-left">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>Meus Dados</span>
+            <span>Meus Dados Cadastrais</span>
           </div>
           <span style="color: var(--text-muted);">›</span>
         </div>
 
-        <div class="settings-menu-item" onclick="UI.showToast('Gerenciamento de cartões e chaves Pix', 'info')">
+        <div class="settings-menu-item" onclick="window.location.hash = '#/perfil/pagamento'" style="cursor: pointer;">
           <div class="settings-item-left">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
             <span>Formas de Pagamento</span>
@@ -49,15 +61,7 @@ window.renderPerfilView = function() {
           <span style="color: var(--text-muted);">›</span>
         </div>
 
-        <div class="settings-menu-item" onclick="UI.showToast('Configurações de Notificação Push & SMS', 'info')">
-          <div class="settings-item-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            <span>Notificações</span>
-          </div>
-          <span style="color: var(--text-muted);">›</span>
-        </div>
-
-        <div class="settings-menu-item" onclick="UI.showToast('Central de Atendimento 24/7 AGhataCris', 'info')">
+        <div class="settings-menu-item" onclick="UI.showToast('Central de Atendimento AGhataCris 24/7', 'info')">
           <div class="settings-item-left">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             <span>Ajuda e Suporte</span>
@@ -65,7 +69,7 @@ window.renderPerfilView = function() {
           <span style="color: var(--text-muted);">›</span>
         </div>
 
-        <div class="settings-menu-item" onclick="UI.showToast('Termos de Uso e Conformidade LGPD', 'info')">
+        <div class="settings-menu-item" onclick="UI.showToast('Termos de Uso alinhados à Lei do Salão Parceiro (Lei 13.352/16)', 'info')">
           <div class="settings-item-left">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             <span>Termos de Uso & Salão Parceiro</span>
@@ -81,13 +85,26 @@ window.renderPerfilView = function() {
       </button>
 
       <div class="text-center" style="margin-top: 20px; font-size: 0.75rem; color: var(--text-muted);">
-        AGhataCris PWA • Versão 2.4.1 (Sprint 1)
+        AGhataCris PWA • Versão 2.4.1 (Sprint 3)
       </div>
     </div>
   `;
 };
 
 window.handleLogout = function() {
-  UI.showToast('Sessão encerrada com sucesso', 'info');
+  if (window.appState && window.appState.logout) {
+    window.appState.logout();
+  }
+  UI.showToast('Você saiu da sua conta.', 'info');
   window.location.hash = '#/login';
+};
+
+// Redirecionamento padronizado para a tela de Dados Cadastrais
+window.openEditarPerfilModal = function() {
+  window.location.hash = '#/perfil/editar';
+};
+
+window.closeEditarPerfilModal = function() {
+  const modal = document.getElementById('modal-editar-perfil');
+  if (modal) modal.remove();
 };

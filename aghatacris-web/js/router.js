@@ -27,7 +27,10 @@ class Router {
 
       // Universal Profile & Admin
       '/perfil': () => window.renderPerfilView(),
-      '/admin': () => window.renderAdminView()
+      '/perfil/editar': () => window.renderEditarPerfilView(),
+      '/perfil/pagamento': () => window.renderPagamentoView(),
+      '/admin': () => window.renderAdminView(),
+      '/admin/home': () => window.renderAdminView()
     };
 
     window.addEventListener('hashchange', () => this.handleRouteChange());
@@ -74,6 +77,13 @@ class Router {
     if (path === '/cliente/home' || path === '/') {
       setTimeout(() => {
         if (window.initMapIfPresent) window.initMapIfPresent();
+      }, 50);
+    }
+
+    // If on admin, init supervision map
+    if (path === '/admin' || path === '/admin/home') {
+      setTimeout(() => {
+        if (window.initAdminMapIfPresent) window.initAdminMapIfPresent();
       }, 50);
     }
 

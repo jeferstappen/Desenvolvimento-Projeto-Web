@@ -111,7 +111,7 @@ window.renderNavbar = function() {
   }
 
   navEl.innerHTML = navItems.map(item => {
-    const isActive = currentRoute === item.route;
+    const isActive = currentRoute === item.route || (item.route === '/perfil' && currentRoute.startsWith('/perfil'));
     return `
       <button class="nav-item ${isActive ? 'active' : ''}" onclick="window.location.hash = '#${item.route}'">
         ${item.icon}

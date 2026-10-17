@@ -20,6 +20,8 @@ class UsuarioModel {
     especialidade,
     preco_estimado,
     modalidade,
+    cpf,
+    cnpj,
     latitude = -23.561684,
     longitude = -46.655981
   }) {
@@ -41,8 +43,8 @@ class UsuarioModel {
       INSERT INTO usuario (
         nome_completo, email, senha_hash, tipo_perfil, avatar,
         especialidade, preco_estimado, modalidade, latitude, longitude,
-        is_online, saldo, ganhos_hoje, receita_passiva_mes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0.0, 0.0, 0.0)
+        cpf, cnpj, is_online, saldo, ganhos_hoje, receita_passiva_mes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0.0, 0.0, 0.0)
     `;
 
     const result = db.run(sql, [
@@ -55,7 +57,9 @@ class UsuarioModel {
       parseFloat(preco_estimado) || 0.0,
       modalidade || 'Ambos',
       parseFloat(latitude),
-      parseFloat(longitude)
+      parseFloat(longitude),
+      cpf || null,
+      cnpj || null
     ]);
 
     return this.findById(result.lastInsertRowid);
@@ -66,6 +70,10 @@ class UsuarioModel {
     if (!user) return null;
     delete user.senha_hash; // Nunca expor o hash de senha
     return user;
+  }
+
+  static findByIdWithPassword(id) {
+    return db.queryOne('SELECT * FROM usuario WHERE id_usuario = ?', [id]);
   }
 
   static findByEmail(email) {
@@ -102,6 +110,30 @@ class UsuarioModel {
     db.run(
       'UPDATE usuario SET latitude = ?, longitude = ? WHERE id_usuario = ?',
       [parseFloat(latitude), parseFloat(longitude), id]
+    );
+    return this.findById(id);
+  }
+
+  /**
+   * Atualização de dados cadastrais do perfil (sem CPF/CNPJ - imutáveis)
+   */
+  static updateProfile(id, { nome_completo, email, especialidade, preco_estimado, modalidade }) {
+    db.run(
+      `UPDATE usuario SET
+        nome_completo = COALESCE(?, nome_completo),
+        email = COALESCE(?, email),
+        especialidade = COALESCE(?, especialidade),
+        preco_estimado = COALESCE(?, preco_estimado),
+        modalidade = COALESCE(?, modalidade)
+       WHERE id_usuario = ?`,
+      [
+        nome_completo || null,
+        email ? email.toLowerCase().trim() : null,
+        especialidade || null,
+        preco_estimado !== undefined ? parseFloat(preco_estimado) : null,
+        modalidade || null,
+        id
+      ]
     );
     return this.findById(id);
   }
