@@ -45,18 +45,19 @@ function renderPagamentoCliente(dados, user) {
     <!-- Cartão Visual Estilizado -->
     <div style="margin-bottom: 22px;">
       <div style="
-        background: linear-gradient(135deg, #0F172A 0%, #1E293B 40%, #0D9488 100%);
+        background: linear-gradient(135deg, #18181B 0%, #09090B 100%);
         color: white;
         padding: 22px;
         border-radius: 18px;
-        box-shadow: 0 12px 30px rgba(13, 148, 136, 0.25);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         position: relative;
         overflow: hidden;
       ">
-        <div style="position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.06); border-radius: 50%;"></div>
+        <div style="position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.04); border-radius: 50%;"></div>
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-          <span style="font-weight: 800; letter-spacing: 1px; font-size: 0.95rem; color: #5EEAD4;">AGhataCris Pay</span>
+          <span style="font-weight: 800; letter-spacing: 1px; font-size: 0.95rem; color: #FFFFFF;">GlamGo Pay</span>
           <span style="font-size: 0.8rem; font-weight: 700; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 20px;">
             ${bandeira}
           </span>
@@ -338,7 +339,7 @@ function renderPagamentoAdmin() {
   return `
     <div class="surface-card text-center" style="padding: 24px;">
       <h3 class="font-bold text-base text-primary">Gestão de Gateway da Plataforma</h3>
-      <p class="text-xs text-muted" style="margin-top: 6px;">Como Administrador, as taxas de plataforma são liquidadas na conta de custódia AGhataCris Escrow.</p>
+      <p class="text-xs text-muted" style="margin-top: 6px;">Como Administrador, as taxas de plataforma são liquidadas na conta de custódia GlamGo Escrow.</p>
     </div>
   `;
 }

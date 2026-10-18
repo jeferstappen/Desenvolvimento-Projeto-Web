@@ -61,7 +61,7 @@ window.renderPerfilView = function() {
           <span style="color: var(--text-muted);">›</span>
         </div>
 
-        <div class="settings-menu-item" onclick="UI.showToast('Central de Atendimento AGhataCris 24/7', 'info')">
+        <div class="settings-menu-item" onclick="UI.showToast('Central de Atendimento GlamGo 24/7', 'info')">
           <div class="settings-item-left">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             <span>Ajuda e Suporte</span>
@@ -85,7 +85,7 @@ window.renderPerfilView = function() {
       </button>
 
       <div class="text-center" style="margin-top: 20px; font-size: 0.75rem; color: var(--text-muted);">
-        AGhataCris PWA • Versão 2.4.1 (Sprint 3)
+        GlamGo PWA • Versão 2.5 (Edição Minimalista)
       </div>
     </div>
   `;

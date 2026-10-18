@@ -58,7 +58,7 @@ const server = http.createServer(async (req, res) => {
 if (require.main === module) {
   server.listen(PORT, () => {
     console.log(`\n======================================================`);
-    console.log(` 🚀 Servidor AGhataCris Web & API REST Ativo!`);
+    console.log(` 🚀 Servidor GlamGo Web & API REST Ativo!`);
     console.log(` 🌐 Frontend PWA: http://localhost:${PORT}/`);
     console.log(` 📡 Health Check: http://localhost:${PORT}/api/health`);
     console.log(` 📍 Raio de busca geográfico padrão: ${config.DEFAULT_RADIUS_KM} km`);

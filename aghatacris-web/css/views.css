@@ -4,52 +4,160 @@
    1. AUTH VIEWS (LOGIN & REGISTER)
    ========================================= */
 .auth-container {
-  padding: 32px 24px;
+  padding: 32px 20px 24px 20px;
   display: flex;
   flex-direction: column;
   min-height: 100%;
   justify-content: space-between;
+  background-color: #FAFAFA;
 }
 
 .auth-header {
   text-align: center;
-  margin-bottom: 28px;
-}
-
-.auth-logo {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--primary-teal);
-  letter-spacing: -0.5px;
-  margin-bottom: 6px;
+  margin-bottom: 24px;
 }
 
 .auth-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-size: 0.95rem;
+  color: #666666;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+.auth-card {
+  background: #FFFFFF;
+  border: 1px solid #ECECEC;
+  border-radius: 24px;
+  padding: 26px 20px 22px 20px;
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.05), 0 4px 14px rgba(0, 0, 0, 0.02);
+  margin-bottom: 16px;
+}
+
+.forgot-password-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+  margin-bottom: 20px;
+}
+
+.forgot-password-link {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: #111111;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+  color: #333333;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 6px;
+  color: #9CA3AF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #000000;
+}
+
+.password-toggle-btn svg {
+  width: 19px;
+  height: 19px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #E5E7EB;
+}
+
+.auth-divider span {
+  padding: 0 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.social-auth-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.social-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #111111;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.social-btn:hover {
+  border-color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.social-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 .auth-footer {
   text-align: center;
-  margin-top: 24px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  margin-top: 16px;
+  font-size: 0.875rem;
+  color: #444444;
 }
 
 .demo-account-pills {
-  margin-top: 16px;
-  padding: 12px;
-  background: var(--bg-subtle);
+  margin-top: 14px;
+  padding: 10px;
+  background: #F4F4F5;
   border-radius: var(--radius-sm);
-  border: 1px dashed var(--border-subtle);
+  border: 1px dashed #D4D4D8;
 }
 
 .demo-pills-title {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+  color: #71717A;
+  margin-bottom: 6px;
   text-align: center;
 }
 
@@ -62,16 +170,18 @@
 .demo-pill-btn {
   font-size: 0.7rem;
   font-weight: 600;
-  padding: 4px 8px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-light);
+  padding: 5px 10px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
   border-radius: var(--radius-xs);
-  color: var(--text-primary);
+  color: #111111;
+  transition: all 0.15s ease;
 }
 
 .demo-pill-btn:hover {
-  border-color: var(--primary-teal);
-  color: var(--primary-teal);
+  border-color: #000000;
+  background: #000000;
+  color: #FFFFFF;
 }
 
 /* =========================================

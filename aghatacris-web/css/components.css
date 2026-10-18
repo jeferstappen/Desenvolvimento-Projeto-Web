@@ -21,23 +21,33 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-teal-dark) 100%);
+  background-color: #000000;
   color: #FFFFFF;
-  box-shadow: var(--shadow-teal);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 14px;
+  box-shadow: 0 8px 20px -2px rgba(0, 0, 0, 0.35);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-teal-light) 0%, var(--primary-teal) 100%);
+  background-color: #333333;
+  transform: translateY(-1px);
 }
 
 .btn-emerald {
-  background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-emerald-dark) 100%);
+  background-color: #000000;
   color: #FFFFFF;
-  box-shadow: var(--shadow-emerald);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 14px;
+  box-shadow: 0 8px 20px -2px rgba(0, 0, 0, 0.3);
 }
 
 .btn-emerald:hover {
-  filter: brightness(1.05);
+  background-color: #333333;
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -176,16 +186,16 @@
 }
 
 .role-card-option.selected {
-  border-color: var(--primary-teal);
-  background: var(--primary-teal-soft);
+  border-color: #000000;
+  background: #000000;
 }
 
 .role-card-option.selected svg {
-  color: var(--primary-teal);
+  color: #FFFFFF;
 }
 
 .role-card-option.selected span {
-  color: var(--primary-teal-dark);
+  color: #FFFFFF;
 }
 
 /* Filter Pills (Fig 3) */
@@ -215,10 +225,10 @@
 }
 
 .filter-pill.active {
-  background: var(--primary-teal);
-  border-color: var(--primary-teal);
+  background: #000000;
+  border-color: #000000;
   color: #FFFFFF;
-  box-shadow: var(--shadow-teal);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* Professional Card (Fig 3 & Fig 4) */
@@ -238,7 +248,7 @@
 .pro-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: var(--primary-teal-soft);
+  border-color: #111111;
 }
 
 .pro-avatar {
@@ -246,7 +256,7 @@
   height: 52px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--primary-teal-light);
+  border: 2px solid #000000;
   flex-shrink: 0;
 }
 
@@ -434,12 +444,12 @@
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-teal) 0%, var(--accent-emerald) 100%);
+  background: #000000;
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 25px rgba(13, 148, 136, 0.45);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   z-index: 60;
   border: 2.5px solid #FFFFFF;
@@ -447,8 +457,9 @@
 }
 
 .fab-btn:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 12px 30px rgba(13, 148, 136, 0.65);
+  transform: scale(1.08) translateY(-2px);
+  background: #262626;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
 }
 
 .fab-btn:active {
@@ -558,18 +569,18 @@
 
 .calendar-day:hover:not(.disabled) {
   background: var(--primary-teal-soft);
-  color: var(--primary-teal);
+  color: #000000;
 }
 
 .calendar-day.selected {
-  background: var(--primary-teal) !important;
+  background: #000000 !important;
   color: #FFFFFF !important;
   font-weight: 800;
-  box-shadow: 0 4px 10px rgba(13, 148, 136, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 
 .calendar-day.today {
-  border-color: var(--primary-teal);
+  border-color: #000000;
   font-weight: 800;
 }
 
@@ -610,15 +621,15 @@
 }
 
 .slot-item:hover:not(.slot-disabled) {
-  border-color: var(--primary-teal);
-  background: var(--primary-teal-soft);
-  color: var(--primary-teal);
+  border-color: #000000;
+  background: #F4F4F5;
+  color: #000000;
 }
 
 .slot-item.slot-selected {
-  background: var(--primary-teal);
+  background: #000000;
   color: #FFFFFF;
-  border-color: var(--primary-teal);
+  border-color: #000000;
   box-shadow: var(--shadow-sm);
 }
 

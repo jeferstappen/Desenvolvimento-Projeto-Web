@@ -1,11 +1,11 @@
 {
-  "name": "AGhataCris - Pronto Atendimento Estético",
-  "short_name": "AGhataCris",
+  "name": "GlamGo - Pronto Atendimento Estético",
+  "short_name": "GlamGo",
   "description": "Plataforma de pronto atendimento estético sob demanda em tempo real",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#F8FAFC",
-  "theme_color": "#0D9488",
+  "background_color": "#FAFAFA",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "./assets/icon-192.png",

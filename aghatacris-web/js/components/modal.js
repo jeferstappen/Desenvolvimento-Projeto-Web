@@ -167,7 +167,7 @@ window.UI = {
           <span>R$ ${at.taxa_salao.toFixed(2)}</span>
         </div>
         <div class="flex justify-between" style="margin-bottom: 4px;">
-          <span class="text-secondary">Taxa Plataforma AGhataCris (10%):</span>
+          <span class="text-secondary">Taxa Plataforma GlamGo (10%):</span>
           <span>R$ ${at.taxa_plataforma.toFixed(2)}</span>
         </div>
         <div class="flex justify-between items-center" style="margin-top: 10px; font-size: 1.05rem;">

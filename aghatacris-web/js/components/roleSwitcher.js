@@ -11,7 +11,7 @@ window.renderSimulatorToolbar = function() {
   toolbarEl.innerHTML = `
     <div class="toolbar-brand">
       <span class="brand-dot"></span>
-      <span>AGhataCris • Apresentação</span>
+      <span>GlamGo • Apresentação</span>
     </div>
 
     <div class="toolbar-roles">

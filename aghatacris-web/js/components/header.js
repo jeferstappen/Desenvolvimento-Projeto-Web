@@ -33,7 +33,7 @@ window.renderHeader = function() {
 
   headerEl.innerHTML = `
     <div class="brand-title" onclick="window.location.hash = '#/' + window.appState.getState().currentRole + '/home'" style="cursor: pointer;">
-      <span>AGhataCris</span>
+      <span>GlamGo</span>
       <span class="brand-badge">${state.currentRole}</span>
     </div>
 
