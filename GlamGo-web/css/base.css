@@ -1,0 +1,215 @@
+/* AGhataCris Base Styles & Global Utilities */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-main);
+  background-color: #FAFAFA; /* Fundo neutro bem claro - GlamGo */
+  color: #111111;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Estilo Minimalista Preto e Branco - GlamGo */
+.brand-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000000;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.brand-underline {
+  width: 38px;
+  height: 3px;
+  background-color: #000000;
+  border-radius: 2px;
+  margin: 6px auto 14px auto;
+}
+
+.btn-primary-custom {
+  background-color: #000000; /* Botão principal preto */
+  color: #FFFFFF;            /* Texto branco */
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 14px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px -2px rgba(0, 0, 0, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.btn-primary-custom:hover {
+  background-color: #333333; /* Tom de cinza chumbo no hover */
+  transform: translateY(-1px);
+}
+
+.btn-primary-custom:active {
+  transform: scale(0.98);
+}
+
+a.text-link {
+  color: #000000;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+a.text-link:hover {
+  color: #333333;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+  touch-action: manipulation;
+  transition: all var(--transition-fast);
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  outline: none;
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  width: 100%;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+a {
+  color: #000000;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: #333333;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Typography Utilities */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-base { font-size: 1rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+.text-muted { color: var(--text-muted); }
+.text-secondary { color: var(--text-secondary); }
+.text-teal { color: var(--primary-teal); }
+.text-emerald { color: #16A34A !important; font-weight: 700; }
+.price-green { color: #16A34A !important; font-weight: 800; }
+.text-coral { color: var(--accent-coral); }
+
+/* Flex & Grid Helpers */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.badge-emerald {
+  background-color: var(--accent-emerald-soft);
+  color: var(--accent-emerald-dark);
+}
+
+.badge-teal {
+  background-color: var(--primary-teal-soft);
+  color: var(--primary-teal-dark);
+}
+
+.badge-amber {
+  background-color: #FEF3C7;
+  color: #D97706;
+}
+
+.badge-coral {
+  background-color: #FFE4E6;
+  color: #E11D48;
+}
+
+/* Glass & Surface */
+.surface-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.surface-card:hover {
+  box-shadow: var(--shadow-md);
+}

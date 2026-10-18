@@ -1,0 +1,13 @@
+﻿# SQLite Database & Runtime Files
+*.db
+*.db-wal
+*.db-shm
+database/*.db
+database/*.db-wal
+database/*.db-shm
+
+# Logs & Temp
+*.log
+.DS_Store
+Thumbs.db
+node_modules/
