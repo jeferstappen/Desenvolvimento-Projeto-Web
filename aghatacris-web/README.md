@@ -311,6 +311,4 @@ Valor Total do Serviço
 
 <div align="center">
 
-Desenvolvido com 💜 para o IFSP Birigui · 2026
-
 </div>
