@@ -1,7 +1,7 @@
 
 <div align="center">
 
-# 💇‍♀️ GlemGo
+# 💇‍♀️ GlamGo
 
 ### Plataforma Web Responsiva de Pronto Atendimento Estético sob Demanda
 
@@ -23,7 +23,7 @@
 
 ## 📖 Sobre o Projeto
 
-**GlemGo** é uma plataforma web responsiva (PWA/SPA Mobile-First) que conecta **clientes** a **profissionais autônomos de estética** e **salões parceiros** em tempo real, com base em **geolocalização inteligente** e raio de busca de até 15 km.
+**GlamGo** é uma plataforma web responsiva (PWA/SPA Mobile-First) que conecta **clientes** a **profissionais autônomos de estética** e **salões parceiros** em tempo real, com base em **geolocalização inteligente** e raio de busca de até 15 km.
 
 O sistema resolve dois problemas simultâneos do mercado da beleza:
 
@@ -77,7 +77,7 @@ O sistema resolve dois problemas simultâneos do mercado da beleza:
 
 ```
 
-glemgo-web/
+glamgo-web/
 │
 ├── 📄 index.html              # Ponto de entrada do PWA (SPA)
 ├── 📄 server.js               # Servidor unificado (HTTP + REST API)
@@ -129,7 +129,7 @@ glemgo-web/
 │
 └── 🗄️ database/
 ├── schema.sql
-├── glemgo.db              # Banco SQLite com dados de teste
+├── GlamGo.db              # Banco SQLite com dados de teste
 └── migrate_services_payments.js
 
 ```
@@ -163,7 +163,7 @@ glemgo-web/
 git clone [https://github.com/jeferstappen/Desenvolvimento-Projeto-Web.git](https://github.com/jeferstappen/Desenvolvimento-Projeto-Web.git)
 
 # 2. Entre na pasta do projeto
-cd Desenvolvimento-Projeto-Web/glemgo-web
+cd Desenvolvimento-Projeto-Web/GlamGo-web
 
 # 3. Inicie o servidor
 node server.js
@@ -174,7 +174,7 @@ Acesse no navegador: **`http://localhost:3000/`**
 
 ```
 ======================================================
- 🚀 Servidor GlemGo Web & API REST Ativo!
+ 🚀 Servidor GlamGo Web & API REST Ativo!
  🌐 Frontend PWA: http://localhost:3000/
  📡 Health Check: http://localhost:3000/api/health
  📍 Raio de busca geográfico padrão: 15 km
@@ -264,7 +264,7 @@ Acesse no navegador: **`http://localhost:3000/`**
 
 ```
 Valor Total do Serviço
-    ├── 10% ──────────► Plataforma GlemGo
+    ├── 10% ──────────► Plataforma GlamGo
     ├── R$ X ──────────► Salão Parceiro (aluguel da cadeira)
     └── Restante ──────► Profissional Autônoma (valor líquido)
 
