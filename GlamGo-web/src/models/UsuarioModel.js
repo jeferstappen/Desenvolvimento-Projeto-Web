@@ -22,6 +22,7 @@ class UsuarioModel {
     modalidade,
     cpf,
     cnpj,
+    telefone,
     latitude = -23.561684,
     longitude = -46.655981
   }) {
@@ -43,8 +44,8 @@ class UsuarioModel {
       INSERT INTO usuario (
         nome_completo, email, senha_hash, tipo_perfil, avatar,
         especialidade, preco_estimado, modalidade, latitude, longitude,
-        cpf, cnpj, is_online, saldo, ganhos_hoje, receita_passiva_mes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0.0, 0.0, 0.0)
+        cpf, cnpj, telefone, is_online, saldo, ganhos_hoje, receita_passiva_mes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0.0, 0.0, 0.0)
     `;
 
     const result = db.run(sql, [
@@ -59,7 +60,8 @@ class UsuarioModel {
       parseFloat(latitude),
       parseFloat(longitude),
       cpf || null,
-      cnpj || null
+      cnpj || null,
+      telefone || null
     ]);
 
     return this.findById(result.lastInsertRowid);

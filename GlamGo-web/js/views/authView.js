@@ -123,8 +123,14 @@ window.renderRegisterView = function() {
               <input type="text" id="reg-name" placeholder="Ex: Maria Silva" required />
             </div>
 
-            <!-- CPF (Cliente / Freelancer) -->
-            <div class="form-group" id="group-cpf">
+            <!-- Telefone (Cliente) -->
+            <div class="form-group" id="group-telefone">
+              <label class="form-label">Telefone / Celular</label>
+              <input type="text" id="reg-phone" placeholder="(11) 98765-4321" maxlength="15" oninput="window.maskPhone(this)" />
+            </div>
+
+            <!-- CPF (Freelancer) -->
+            <div class="form-group" id="group-cpf" style="display: none;">
               <label class="form-label">CPF</label>
               <input type="text" id="reg-cpf" placeholder="000.000.000-00" maxlength="14" oninput="window.maskCPF(this)" />
             </div>
@@ -187,10 +193,12 @@ window.selectRegisterRole = function(role, el) {
     nameInput.placeholder = role === 'salao' ? 'Ex: Studio Elegance' : 'Ex: Maria Silva';
   }
 
-  // Toggle CPF / CNPJ com display flex para manter layout padronizado de coluna
+  // Toggle Telefone / CPF / CNPJ com display flex para manter layout padronizado de coluna
+  const groupTelefone = document.getElementById('group-telefone');
   const groupCPF = document.getElementById('group-cpf');
   const groupCNPJ = document.getElementById('group-cnpj');
-  if (groupCPF) groupCPF.style.display = role === 'salao' ? 'none' : 'flex';
+  if (groupTelefone) groupTelefone.style.display = role === 'cliente' ? 'flex' : 'none';
+  if (groupCPF) groupCPF.style.display = role === 'freelancer' ? 'flex' : 'none';
   if (groupCNPJ) groupCNPJ.style.display = role === 'salao' ? 'flex' : 'none';
 };
 
@@ -249,6 +257,7 @@ window.handleRegisterSubmit = async function() {
   const nameInput = document.getElementById('reg-name');
   const emailInput = document.getElementById('reg-email');
   const passInput = document.getElementById('reg-password');
+  const phoneInput = document.getElementById('reg-phone');
   const cpfInput = document.getElementById('reg-cpf');
   const cnpjInput = document.getElementById('reg-cnpj');
 
@@ -258,11 +267,17 @@ window.handleRegisterSubmit = async function() {
   const email = emailInput.value.trim();
   const password = passInput.value;
   const role = window.selectedRegisterRole || 'cliente';
+  const phone = phoneInput ? phoneInput.value.trim() : '';
   const cpf = cpfInput ? cpfInput.value.trim() : '';
   const cnpj = cnpjInput ? cnpjInput.value.trim() : '';
 
   if (!name || !email || !password) {
     UI.showToast('Por favor, preencha todos os campos.', 'error');
+    return;
+  }
+
+  if (role === 'cliente' && phone && phone.replace(/\D/g, '').length < 10) {
+    UI.showToast('Por favor, informe o telefone com DDD e ao menos 8 ou 9 dígitos.', 'error');
     return;
   }
 
@@ -274,7 +289,8 @@ window.handleRegisterSubmit = async function() {
         email: email,
         senha: password,
         tipo_perfil: formattedRole,
-        cpf: role !== 'salao' ? cpf : undefined,
+        telefone: role === 'cliente' ? phone : undefined,
+        cpf: role === 'freelancer' ? cpf : undefined,
         cnpj: role === 'salao' ? cnpj : undefined
       });
 
@@ -303,7 +319,32 @@ window.handleRegisterSubmit = async function() {
   }
 };
 
-// Máscaras de CPF e CNPJ
+// Máscaras de Telefone, CPF e CNPJ
+window.maskPhone = function(input) {
+  let v = input.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.substring(0, 11);
+
+  if (v.length === 0) {
+    input.value = '';
+    return;
+  }
+  if (v.length <= 2) {
+    input.value = '(' + v;
+    return;
+  }
+  if (v.length <= 6) {
+    input.value = '(' + v.substring(0, 2) + ') ' + v.substring(2);
+    return;
+  }
+  if (v.length <= 10) {
+    // Telefone fixo / 8 dígitos: (11) 8765-4321
+    input.value = '(' + v.substring(0, 2) + ') ' + v.substring(2, 6) + '-' + v.substring(6);
+    return;
+  }
+  // Celular com 9 dígitos: (11) 98765-4321
+  input.value = '(' + v.substring(0, 2) + ') ' + v.substring(2, 7) + '-' + v.substring(7, 11);
+};
+
 window.maskCPF = function(input) {
   let v = input.value.replace(/\D/g, '').substring(0, 11);
   v = v.replace(/(\d{3})(\d)/, '$1.$2');

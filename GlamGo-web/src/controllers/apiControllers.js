@@ -13,7 +13,7 @@ const config = require('../config');
 class AuthController {
   static async register(req, res) {
     try {
-      const { nome_completo, email, senha, tipo_perfil, especialidade, preco_estimado, modalidade, cpf, cnpj, latitude, longitude } = req.body;
+      const { nome_completo, email, senha, tipo_perfil, especialidade, preco_estimado, modalidade, cpf, cnpj, telefone, latitude, longitude } = req.body;
       
       if (!nome_completo || !email || !tipo_perfil) {
         return res.status(400).json({ success: false, error: 'Campos obrigatórios ausentes (nome_completo, email, tipo_perfil).' });
@@ -34,6 +34,7 @@ class AuthController {
         modalidade,
         cpf,
         cnpj,
+        telefone,
         latitude,
         longitude
       });

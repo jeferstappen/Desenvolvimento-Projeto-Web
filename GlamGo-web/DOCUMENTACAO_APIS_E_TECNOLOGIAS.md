@@ -89,7 +89,9 @@ Cadastra um novo usuário no sistema.
   "nome_completo": "Nome do Usuário",
   "email": "usuario@exemplo.com",
   "senha": "senhaSegura123",
-  "telefone": "(11) 99999-9999",
+  "telefone": "(11) 99999-9999", // Padrão com DDD e até 9 dígitos para Cliente
+  "cpf": "000.000.000-00",        // Para Freelancer Autônoma
+  "cnpj": "00.000.000/0000-00",   // Para Salão Parceiro
   "tipo_perfil": "Cliente | Freelancer | Salao",
   "especialidade": "Opcional para Freelancer/Salão",
   "latitude": -23.55052,
@@ -104,6 +106,7 @@ Cadastra um novo usuário no sistema.
     "id_usuario": 149,
     "nome_completo": "Nome do Usuário",
     "email": "usuario@exemplo.com",
+    "telefone": "(11) 99999-9999",
     "tipo_perfil": "Cliente"
   }
 }

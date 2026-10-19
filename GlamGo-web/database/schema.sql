@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS usuario (
     tipo_perfil VARCHAR(50) NOT NULL CHECK(tipo_perfil IN ('Cliente', 'Freelancer', 'Salao', 'Administrador')),
     cpf VARCHAR(14) NULL,
     cnpj VARCHAR(18) NULL,
+    telefone VARCHAR(20) NULL,
     avatar VARCHAR(255) DEFAULT 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     especialidade VARCHAR(150) NULL,
     avaliacao DECIMAL(2, 1) DEFAULT 5.0,
