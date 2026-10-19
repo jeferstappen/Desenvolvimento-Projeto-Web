@@ -76,12 +76,21 @@ window.UI = {
     if (!pro) return;
 
     this.openModal(`
-      <div class="flex items-center gap-3" style="margin-bottom: 16px;">
-        <img src="${pro.avatar}" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-teal);" />
-        <div>
-          <h3 class="modal-title" style="margin: 0;">${pro.nome_completo}</h3>
-          <p class="text-sm text-secondary">${pro.especialidade} • <strong>${pro.distanciaKm} km de você</strong></p>
+      <div class="flex items-center justify-between" style="margin-bottom: 16px;">
+        <div class="flex items-center gap-3">
+          <img src="${pro.avatar}" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-teal);" />
+          <div>
+            <h3 class="modal-title" style="margin: 0;">${pro.nome_completo}</h3>
+            <p class="text-sm text-secondary">${pro.especialidade} • <strong>${pro.distanciaKm} km de você</strong></p>
+          </div>
         </div>
+        <button class="favorite-heart-btn ${pro.isFavorita ? 'is-favorited' : ''}" 
+                onclick="window.toggleFavoritePro(${pro.id_usuario}, this)" 
+                title="${pro.isFavorita ? 'Remover dos favoritos' : 'Favoritar profissional'}">
+          <svg viewBox="0 0 24 24" fill="${pro.isFavorita ? '#EF4444' : 'none'}" stroke="${pro.isFavorita ? '#EF4444' : '#6B7280'}" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
       </div>
 
       <div style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 20px;">
@@ -230,7 +239,17 @@ window.UI = {
             <h3 class="modal-title" style="margin: 0; font-size: 1.15rem;">${salao.nome_completo}</h3>
             <p class="text-xs text-muted" style="margin-top: 3px;">📍 ${salao.endereco} • <strong>${salao.distanciaKm} km de você</strong></p>
           </div>
-          <span class="badge badge-emerald" style="font-weight: 700;">★ ${salao.avaliacao}</span>
+          <div class="flex items-center gap-2">
+            <span class="badge badge-emerald" style="font-weight: 700;">★ ${salao.avaliacao}</span>
+            <button class="favorite-heart-btn ${salao.isFavorita ? 'is-favorited' : ''}" 
+                    style="width: 32px; height: 32px; box-shadow: none;"
+                    onclick="window.toggleFavoriteSalao(${salao.id_usuario}, this)" 
+                    title="${salao.isFavorita ? 'Remover dos favoritos' : 'Favoritar salão parceiro'}">
+              <svg viewBox="0 0 24 24" fill="${salao.isFavorita ? '#EF4444' : 'none'}" stroke="${salao.isFavorita ? '#EF4444' : '#6B7280'}" stroke-width="2" style="width: 16px; height: 16px;">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 

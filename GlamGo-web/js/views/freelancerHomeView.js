@@ -135,26 +135,111 @@ window.renderFreelancerHomeView = function() {
         <a href="#/freelancer/agenda" class="text-xs font-bold text-teal">Ver Agenda</a>
       </div>
 
-      <div class="surface-card flex items-center justify-between" style="padding: 12px 16px;">
-        <div class="flex items-center gap-3">
-          <div style="background: var(--bg-subtle); padding: 8px; border-radius: var(--radius-xs); font-weight: 800; font-size: 0.85rem; color: var(--primary-teal);">
-            14:30
-          </div>
-          <div>
-            <div class="font-bold text-sm text-primary">Design de Sobrancelhas</div>
-            <div class="text-xs text-secondary">Beatriz Fontes • No Salão</div>
-          </div>
-        </div>
-        <button class="btn-ghost" onclick="UI.showToast('Detalhes do agendamento de 14:30', 'info')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        </button>
-      </div>
+      ${(() => {
+        const proximo = (state.atendimentos || []).find(a =>
+          (a.status === 'Confirmado' || a.status === 'Pendente' || a.status === 'Em Andamento') &&
+          (!a.id_freelancer || a.id_freelancer === currentProId || (a.freelancer_nome && (a.freelancer_nome.toLowerCase().includes('mariana') || a.freelancer_nome.toLowerCase().includes('verstappen'))))
+        );
 
-      <!-- Floating Action Button (FAB): Criar Serviços Ofertados -->
-      <button class="fab-btn" onclick="UI.openGerenciarServicosModal()" title="Criar e Gerenciar Serviços Ofertados">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        <span class="fab-tooltip">Criar Serviço Ofertado</span>
-      </button>
+        if (!proximo) {
+          return `
+            <div class="surface-card flex items-center justify-between" style="padding: 14px 16px;">
+              <span class="text-xs text-muted">Nenhum agendamento pendente para as próximas horas.</span>
+              <a href="#/freelancer/agenda" class="text-xs font-bold text-teal">Abrir Agenda →</a>
+            </div>
+          `;
+        }
+
+        const hora = proximo.hora_agendamento || proximo.previsao_chegada || '14:30';
+        const servicoNome = proximo.servico || 'Atendimento';
+        const clienteNome = proximo.cliente_nome || 'Cliente';
+        const localTipo = proximo.tipo === 'Domicílio' ? 'Domicílio' : (proximo.salao_nome || 'No Salão');
+
+        return `
+          <div class="surface-card flex items-center justify-between" style="padding: 12px 16px; cursor: pointer;" onclick="if(window.selectAgendaDate) window.selectAgendaDate('${proximo.data_agendamento || '2026-10-19'}'); window.location.hash = '#/freelancer/agenda';">
+            <div class="flex items-center gap-3">
+              <div style="background: var(--bg-subtle); padding: 8px; border-radius: var(--radius-xs); font-weight: 800; font-size: 0.85rem; color: var(--primary-teal);">
+                ${hora}
+              </div>
+              <div>
+                <div class="font-bold text-sm text-primary">${servicoNome}</div>
+                <div class="text-xs text-secondary">${clienteNome} • ${localTipo}</div>
+              </div>
+            </div>
+            <button class="btn-ghost" title="Ver na agenda">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </button>
+          </div>
+        `;
+      })()}
+
+      <!-- Histórico de Clientes Atendidos -->
+      ${(() => {
+        const historicoClientes = (state.atendimentos || []).filter(a =>
+          a.status === 'Concluído' &&
+          (!a.id_freelancer || a.id_freelancer === currentProId || (a.freelancer_nome && a.freelancer_nome.toLowerCase().includes('mariana')))
+        );
+
+        return `
+          <div class="flex justify-between items-center" style="margin-top: 22px; margin-bottom: 12px;">
+            <div>
+              <h4 class="text-xs font-bold text-muted" style="text-transform: uppercase; letter-spacing: 0.5px;">HISTÓRICO DE CLIENTES ATENDIDOS</h4>
+              <p class="text-xs text-secondary" style="margin-top: 2px;">Clientes que você já atendeu com sucesso na plataforma</p>
+            </div>
+            <span class="badge badge-emerald">${historicoClientes.length} Atendimentos</span>
+          </div>
+
+          <div class="client-history-list">
+            ${historicoClientes.map(at => {
+              const avatar = at.cliente_avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80';
+              const rating = at.cliente_avaliacao ? at.cliente_avaliacao.toFixed(1) : '5.0';
+              const valorLiquido = at.valor_liquido || (at.valor_total * 0.9);
+              return `
+                <div class="client-history-card">
+                  <div class="client-history-header">
+                    <div class="client-history-info">
+                      <img src="${avatar}" alt="${at.cliente_nome}" class="client-history-avatar" />
+                      <div>
+                        <div class="client-history-name">
+                          ${at.cliente_nome}
+                          <span class="client-history-rating">★ ${rating}</span>
+                        </div>
+                        <span class="client-history-meta">📅 ${at.data || 'Atendimento recente'} • <span class="badge badge-teal" style="font-size: 0.65rem; padding: 2px 6px;">${at.tipo || 'Domicílio'}</span></span>
+                      </div>
+                    </div>
+                    <span class="badge badge-emerald" style="font-size: 0.7rem;">Concluído</span>
+                  </div>
+
+                  <div class="client-history-body">
+                    <div>
+                      <div class="text-xs text-muted" style="margin-bottom: 2px;">Serviço Realizado</div>
+                      <div class="client-history-service">✂️ ${at.servico || 'Pronto Atendimento'}</div>
+                    </div>
+                    <div>
+                      <div class="text-xs text-muted text-right" style="margin-bottom: 2px;">Seu Repasse Líquido</div>
+                      <div class="client-history-earnings">R$ ${valorLiquido.toFixed(2)}</div>
+                    </div>
+                  </div>
+
+                  <div class="client-history-actions">
+                    <button class="btn btn-sm btn-ghost" style="padding: 4px 8px; font-size: 0.75rem; color: var(--primary-teal);" onclick="UI.openReciboModal(${at.id_atendimento})">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      Ver Recibo & Split
+                    </button>
+                    <span class="text-xs text-muted">ID #${at.id_atendimento}</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+
+            ${historicoClientes.length === 0 ? `
+              <div class="surface-card text-center" style="padding: 24px; color: var(--text-muted); font-size: 0.85rem;">
+                Nenhum histórico de cliente atendido ainda. Finalize atendimentos para registrá-los aqui.
+              </div>
+            ` : ''}
+          </div>
+        `;
+      })()}
     </div>
   `;
 };

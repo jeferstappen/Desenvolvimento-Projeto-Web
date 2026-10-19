@@ -43,7 +43,7 @@ window.renderLoginView = function() {
             </div>
 
             <div class="forgot-password-wrap">
-              <a href="javascript:void(0)" onclick="UI.showToast('Utilize um dos acessos rápidos para demonstração.', 'info')" class="forgot-password-link">Esqueci minha senha</a>
+              <a href="javascript:void(0)" onclick="window.openForgotPasswordModal()" class="forgot-password-link">Esqueci minha senha</a>
             </div>
 
             <button type="submit" class="btn-primary-custom">
@@ -320,3 +320,96 @@ window.maskCNPJ = function(input) {
   v = v.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
   input.value = v;
 };
+
+// Recuperação de Senha (Esqueci minha senha)
+window.openForgotPasswordModal = function() {
+  const loginInput = document.getElementById('login-email');
+  const currentEmail = loginInput ? loginInput.value.trim() : '';
+
+  UI.openModal(`
+    <div style="margin-bottom: 20px;">
+      <div style="width: 50px; height: 50px; border-radius: 50%; background: #F3F4F6; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1px solid #E5E7EB;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h3 class="modal-title" style="margin-bottom: 6px;">Recuperar Senha</h3>
+      <p class="text-sm text-secondary">
+        Digite o e-mail cadastrado na sua conta para enviarmos as instruções de redefinição de senha.
+      </p>
+    </div>
+
+    <form id="form-forgot-password" onsubmit="event.preventDefault(); window.handleForgotPasswordSubmit();">
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label class="form-label" style="text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px;">E-mail Cadastrado</label>
+        <div class="input-with-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          <input type="email" id="recovery-email" value="${currentEmail}" placeholder="seuemail@exemplo.com" required autocomplete="email" />
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="UI.closeModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary-custom" style="flex: 2; margin-top: 0;">
+          Enviar Instruções
+        </button>
+      </div>
+    </form>
+  `);
+
+  setTimeout(() => {
+    const input = document.getElementById('recovery-email');
+    if (input) input.focus();
+  }, 100);
+};
+
+window.handleForgotPasswordSubmit = function() {
+  const emailInput = document.getElementById('recovery-email');
+  if (!emailInput) return;
+  const email = emailInput.value.trim();
+
+  if (!email || !email.includes('@')) {
+    UI.showToast('Por favor, informe um endereço de e-mail válido.', 'error');
+    return;
+  }
+
+  // Pre-fill login input with this email for convenience
+  const loginEmail = document.getElementById('login-email');
+  if (loginEmail) loginEmail.value = email;
+
+  // Pop-up modal confirmando o envio do email para o email do usuário
+  UI.openModal(`
+    <div style="text-align: center; padding: 14px 6px;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: #ECFDF5; border: 2px solid #A7F3D0; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5">
+          <path d="M22 2L11 13"></path>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </div>
+
+      <h3 class="modal-title" style="margin-bottom: 8px; font-size: 1.25rem;">E-mail Enviado!</h3>
+      
+      <p class="text-sm text-secondary" style="margin-bottom: 14px; line-height: 1.5;">
+        Um e-mail com as instruções de recuperação de senha foi enviado com sucesso para:
+      </p>
+
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 18px;">
+        <strong style="color: #0F172A; font-size: 0.95rem; word-break: break-all;">${email}</strong>
+      </div>
+
+      <p class="text-xs text-muted" style="margin-bottom: 22px;">
+        Verifique sua caixa de entrada e pasta de spam. O link de redefinição é seguro e tem validade de 30 minutos.
+      </p>
+
+      <button type="button" class="btn-primary-custom" onclick="UI.closeModal()" style="width: 100%;">
+        Entendido, Voltar ao Login
+      </button>
+    </div>
+  `);
+
+  UI.showToast(`E-mail de recuperação enviado para ${email}!`, 'success');
+};
+

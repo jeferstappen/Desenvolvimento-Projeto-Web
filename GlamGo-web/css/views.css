@@ -59,13 +59,14 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  padding: 6px;
+  padding: 4px;
   color: #9CA3AF;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: color 0.15s ease;
+  z-index: 5;
 }
 
 .password-toggle-btn:hover {
@@ -73,8 +74,11 @@
 }
 
 .password-toggle-btn svg {
-  width: 19px;
-  height: 19px;
+  position: static !important;
+  left: auto !important;
+  width: 20px !important;
+  height: 20px !important;
+  pointer-events: none;
 }
 
 .auth-divider {
@@ -287,6 +291,7 @@
 }
 
 .favorite-card {
+  position: relative;
   background: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
@@ -499,6 +504,98 @@
   margin-top: 4px;
 }
 
+/* Freelancer Client History List */
+.client-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.client-history-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all var(--transition-fast);
+}
+
+.client-history-card:hover {
+  border-color: #D1D5DB;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.client-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.client-history-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.client-history-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #E5E7EB;
+}
+
+.client-history-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.client-history-rating {
+  font-size: 0.72rem;
+  color: #D97706;
+  font-weight: 700;
+}
+
+.client-history-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.client-history-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 10px 0;
+  border-top: 1px dashed var(--border-light);
+  border-bottom: 1px dashed var(--border-light);
+  margin-bottom: 10px;
+}
+
+.client-history-service {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.client-history-earnings {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #16A34A;
+  text-align: right;
+}
+
+.client-history-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /* =========================================
    5. FREELANCER AGENDA (FIG 7)
    ========================================= */
@@ -507,71 +604,200 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  gap: 8px;
 }
 
 .calendar-month-title {
-  font-size: 1.1rem;
+  font-size: 1.12rem;
   font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-nav-btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 1rem;
+  font-weight: 800;
+  user-select: none;
+}
+
+.calendar-nav-btn-icon:hover {
+  background: var(--bg-subtle);
+  border-color: var(--brand-black);
+}
+
+.calendar-pill-today {
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.calendar-pill-today:hover {
+  background: var(--brand-black);
+  color: #FFFFFF;
+  border-color: var(--brand-black);
+}
+
+.calendar-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+
+.calendar-icon-btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--brand-black);
 }
 
 .calendar-week-strip {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
   margin-bottom: 20px;
 }
 
 .calendar-day-card {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 4px;
+  padding: 8px 2px 6px 2px;
   background: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
+  position: relative;
+  user-select: none;
+}
+
+.calendar-day-card:hover:not(.selected) {
+  background: var(--bg-subtle);
+  border-color: var(--border-medium);
 }
 
 .calendar-day-card .day-name {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .calendar-day-card .day-number {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--text-primary);
   margin-top: 2px;
+  line-height: 1.1;
+}
+
+.calendar-day-card.today:not(.selected) {
+  border-color: var(--brand-black);
+  background: var(--bg-subtle);
+}
+
+.calendar-day-card.has-events:not(.selected) {
+  border-bottom: 2.5px solid var(--accent-emerald, #16A34A);
 }
 
 .calendar-day-card.selected {
-  background: var(--primary-teal);
-  border-color: var(--primary-teal);
-  color: #FFFFFF;
-  box-shadow: var(--shadow-teal);
+  background: var(--brand-black) !important;
+  border-color: var(--brand-black) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .calendar-day-card.selected .day-name,
 .calendar-day-card.selected .day-number {
-  color: #FFFFFF;
+  color: #FFFFFF !important;
+}
+
+.calendar-event-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-emerald, #16A34A);
+  margin-top: 3px;
+  display: block;
+}
+
+.calendar-day-card.selected .calendar-event-dot {
+  background: #FFFFFF !important;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.9);
+}
+
+.calendar-event-dot-placeholder {
+  width: 5px;
+  height: 5px;
+  margin-top: 3px;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .timeline-event-card {
   display: flex;
   gap: 12px;
   margin-bottom: 14px;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 .timeline-time-box {
   font-size: 0.75rem;
   font-weight: 800;
   color: var(--text-secondary);
-  width: 50px;
+  width: 52px;
   padding-top: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.timeline-time-box .time-val {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.timeline-time-box .time-dur {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
 .timeline-card-content {
@@ -581,6 +807,21 @@
   border-radius: var(--radius-md);
   padding: 14px;
   box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+}
+
+.timeline-card-content:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--border-medium);
+}
+
+.timeline-client-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--border-light);
+  flex-shrink: 0;
 }
 
 /* =========================================

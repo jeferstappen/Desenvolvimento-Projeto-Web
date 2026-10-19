@@ -159,7 +159,12 @@ window.iniciarSalvarServicoComSenha = function() {
       <form onsubmit="event.preventDefault(); window.executarSalvarServicoFinal('${encodeURIComponent(nome)}', '${encodeURIComponent(desc)}', ${preco}, ${duracao});">
         <div class="form-group" style="text-align: left; margin-bottom: 14px;">
           <label class="form-label">Digite sua senha de acesso</label>
-          <input type="password" id="confirm-pwd-servico" placeholder="••••••••" required autofocus style="letter-spacing: 2px;" />
+          <div style="position: relative;">
+            <input type="password" id="confirm-pwd-servico" placeholder="••••••••" required autofocus style="letter-spacing: 2px; padding-right: 44px; width: 100%;" />
+            <button type="button" class="password-toggle-btn" onclick="window.togglePasswordVisibility('confirm-pwd-servico', this)" title="Mostrar/ocultar senha">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
           <div id="pwd-servico-error" style="color: #EF4444; font-size: 0.75rem; margin-top: 4px; display: none; font-weight: 600;"></div>
         </div>
 
@@ -256,11 +261,163 @@ window.executarSalvarServicoFinal = async function(nomeEncoded, descEncoded, pre
   }
 };
 
-window.confirmarRemocaoServico = async function(servicoId, userId) {
-  if (confirm('Tem certeza que deseja remover este serviço ofertado?')) {
+// =========================================================================
+// Interface no Aplicativo para Confirmação de Exclusão de Serviço com Senha
+// =========================================================================
+window.confirmarRemocaoServico = function(servicoId, userId) {
+  const servicos = window.appState.getServicosByUsuario(userId);
+  const s = servicos.find(item => item.id_servico === servicoId || item.id_servico == servicoId);
+
+  const nome = (s && s.nome) || 'Serviço Selecionado';
+  const preco = (s && s.preco) ? parseFloat(s.preco).toFixed(2) : '0.00';
+  const duracao = (s && s.duracao_minutos) || 60;
+  const descricao = (s && s.descricao) || '';
+
+  const modalHtml = `
+    <div style="text-align: center; padding: 10px 4px;">
+      <!-- Ícone de Alerta / Exclusão -->
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+      </div>
+
+      <h3 class="modal-title" style="margin-bottom: 4px; color: var(--text-primary);">Excluir Serviço Ofertado</h3>
+      <p class="text-xs text-muted" style="margin-bottom: 14px;">
+        Deseja realmente remover este serviço do catálogo? Esta ação não pode ser desfeita.
+      </p>
+
+      <!-- Card do Serviço a ser Excluído -->
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-light); border-left: 4px solid #DC2626; border-radius: var(--radius-sm); padding: 12px 14px; text-align: left; margin-bottom: 16px; box-shadow: var(--shadow-xs);">
+        <strong style="font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 3px;">${nome}</strong>
+        ${descricao ? `<p class="text-xs text-secondary" style="margin: 0 0 6px 0; line-height: 1.3;">${descricao}</p>` : ''}
+        <div style="display: flex; gap: 8px; align-items: center; font-size: 0.75rem;">
+          <span class="badge badge-emerald" style="font-size: 0.7rem; font-weight: 700;">R$ ${preco}</span>
+          <span class="badge badge-teal" style="font-size: 0.7rem;">⏱️ ${duracao} min</span>
+        </div>
+      </div>
+
+      <!-- Formulário com Senha Obrigatória -->
+      <form onsubmit="event.preventDefault(); window.executarExclusaoServicoFinal(${servicoId}, ${userId}, '${encodeURIComponent(nome)}');">
+        <div class="form-group" style="text-align: left; margin-bottom: 16px;">
+          <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary);">
+            Confirme sua senha de acesso:
+          </label>
+          <div style="position: relative; margin-top: 4px;">
+            <input 
+              type="password" 
+              id="confirm-pwd-delete-servico" 
+              placeholder="••••••••" 
+              required 
+              autofocus 
+              style="letter-spacing: 2px; padding-right: 44px; width: 100%;" 
+            />
+            <button 
+              type="button" 
+              class="password-toggle-btn" 
+              onclick="window.togglePasswordVisibility('confirm-pwd-delete-servico', this)" 
+              title="Mostrar/ocultar senha"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+          <div id="pwd-delete-servico-error" style="color: #EF4444; font-size: 0.75rem; margin-top: 6px; display: none; font-weight: 600;"></div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="btn-submit-delete-servico" 
+          class="btn" 
+          style="background: #DC2626; color: #FFFFFF; width: 100%; padding: 12px; font-weight: 800; border-radius: var(--radius-xs); border: none; cursor: pointer; margin-bottom: 8px; transition: background 0.15s ease;"
+          onmouseover="this.style.background='#B91C1C'"
+          onmouseout="this.style.background='#DC2626'"
+        >
+          🗑️ Confirmar Exclusão
+        </button>
+
+        <button 
+          type="button" 
+          class="btn btn-ghost" 
+          style="width: 100%;" 
+          onclick="UI.openGerenciarServicosModal()"
+        >
+          Cancelar e Voltar
+        </button>
+      </form>
+    </div>
+  `;
+
+  UI.openModal(modalHtml);
+};
+
+window.executarExclusaoServicoFinal = async function(servicoId, userId, nomeEncoded) {
+  const pwdInput = document.getElementById('confirm-pwd-delete-servico');
+  const errorEl = document.getElementById('pwd-delete-servico-error');
+  const btn = document.getElementById('btn-submit-delete-servico');
+  const senha = pwdInput ? pwdInput.value : '';
+
+  if (!senha) {
+    if (errorEl) {
+      errorEl.textContent = 'Senha é obrigatória para autorizar a exclusão.';
+      errorEl.style.display = 'block';
+    }
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = 'Verificando senha...';
+
+  const nome = decodeURIComponent(nomeEncoded);
+  const state = window.appState.getState();
+  const role = state.currentRole;
+  const user = state.currentUser || (state.rolesData && state.rolesData[role]) || {};
+  const userEmail = user.email || (role === 'freelancer' ? 'mariana.silva@beauty.com' : 'contato@studioelegance.com.br');
+
+  try {
+    // 1. Validar senha via API / Auth
+    let isValid = false;
+    if (window.API) {
+      try {
+        const authCheck = await window.API.verifyPassword(userEmail, senha, userId);
+        if (authCheck && authCheck.success) isValid = true;
+      } catch (e) {
+        if (e.message && e.message.includes('Senha incorreta')) {
+          isValid = false;
+        } else {
+          // Fallback se offline
+          isValid = (senha === '12345678');
+        }
+      }
+    } else {
+      isValid = (senha === '12345678');
+    }
+
+    if (!isValid) {
+      if (errorEl) {
+        errorEl.textContent = 'Senha incorreta. Não foi possível autorizar a exclusão.';
+        errorEl.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.innerHTML = '🗑️ Confirmar Exclusão';
+      return;
+    }
+
+    // 2. Remover o serviço no state e backend
     await window.appState.removerServico(servicoId, userId);
-    UI.showToast('Serviço removido com sucesso.', 'info');
+
+    // 3. Exibir toast e reabrir o modal com a lista atualizada
+    UI.showToast(`Serviço "${nome}" excluído com sucesso!`, 'success');
     UI.openGerenciarServicosModal();
+
+    // 4. Se a rota atual for salão ou freelancer, re-renderizar para manter consistência
+    if (window.router) {
+      window.router.renderCurrentRoute();
+    }
+  } catch (err) {
+    if (errorEl) {
+      errorEl.textContent = err.message || 'Erro ao excluir o serviço.';
+      errorEl.style.display = 'block';
+    }
+    btn.disabled = false;
+    btn.innerHTML = '🗑️ Confirmar Exclusão';
   }
 };
 

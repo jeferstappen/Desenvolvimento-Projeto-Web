@@ -188,35 +188,118 @@ const defaultState = {
     {
       id_atendimento: 1001,
       id_freelancer: 2,
+      id_cliente: 1,
       cliente_nome: 'Isabela Santos',
-      freelancer_nome: 'Mariana Silva (Você)',
+      cliente_avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+      cliente_avaliacao: 5.0,
+      freelancer_nome: 'Mariana Silva',
       servico: 'Maquiagem & Penteado',
       tipo: 'Domicílio',
       distanciaKm: 1.2,
-      previsaoChegada: '09:45 AM',
+      previsaoChegada: '09:30',
       valor_total: 280.00,
       taxa_salao: 0.00,
       taxa_plataforma: 28.00,
       valor_liquido: 252.00,
       status: 'Concluído',
-      data: 'Hoje, 09:30'
+      data: '2026-10-19 às 09:30',
+      data_agendamento: '2026-10-19',
+      hora_agendamento: '09:30'
     },
     {
-      id_atendimento: 1002,
-      cliente_nome: 'Isabela Santos',
+      id_atendimento: 1020,
+      id_freelancer: 2,
+      id_cliente: 105,
+      cliente_nome: 'Beatriz Fontes',
+      cliente_avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80',
+      cliente_avaliacao: 5.0,
       freelancer_nome: 'Mariana Silva',
-      servico: 'Corte & Escova Premium',
+      servico: 'Design de Sobrancelhas',
       tipo: 'No Salão',
-      valor_total: 120.00,
+      salao_nome: 'Studio Elegance Jardins',
+      distanciaKm: 1.5,
+      previsaoChegada: '14:30',
+      valor_total: 75.00,
+      taxa_salao: 15.00,
+      taxa_plataforma: 7.50,
+      valor_liquido: 52.50,
+      status: 'Em Andamento',
+      data: '2026-10-19 às 14:30',
+      data_agendamento: '2026-10-19',
+      hora_agendamento: '14:30'
+    },
+    {
+      id_atendimento: 1021,
+      id_freelancer: 2,
+      id_cliente: 106,
+      cliente_nome: 'Camila Rocha',
+      cliente_avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&auto=format&fit=crop&q=80',
+      cliente_avaliacao: 4.9,
+      freelancer_nome: 'Mariana Silva',
+      servico: 'Corte & Escova Modeladora',
+      tipo: 'No Salão',
+      salao_nome: 'Studio Elegance Jardins',
+      distanciaKm: 1.2,
+      previsaoChegada: '16:30',
+      valor_total: 130.00,
       taxa_salao: 20.00,
-      taxa_plataforma: 12.00,
-      valor_liquido: 88.00,
-      status: 'Concluído',
-      data: '15 Mai, 14:30'
+      taxa_plataforma: 13.00,
+      valor_liquido: 97.00,
+      status: 'Confirmado',
+      data: '2026-10-19 às 16:30',
+      data_agendamento: '2026-10-19',
+      hora_agendamento: '16:30'
+    },
+    {
+      id_atendimento: 1022,
+      id_freelancer: 2,
+      id_cliente: 107,
+      cliente_nome: 'Larissa Mendes',
+      cliente_avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
+      cliente_avaliacao: 5.0,
+      freelancer_nome: 'Mariana Silva',
+      servico: 'Alongamento de Cílios Fio a Fio',
+      tipo: 'Domicílio',
+      distanciaKm: 2.1,
+      previsaoChegada: '11:00',
+      valor_total: 150.00,
+      taxa_salao: 0.00,
+      taxa_plataforma: 15.00,
+      valor_liquido: 135.00,
+      status: 'Confirmado',
+      data: '2026-10-20 às 11:00',
+      data_agendamento: '2026-10-20',
+      hora_agendamento: '11:00'
+    },
+    {
+      id_atendimento: 1023,
+      id_freelancer: 2,
+      id_cliente: 108,
+      cliente_nome: 'Fernanda Lima',
+      cliente_avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+      cliente_avaliacao: 4.8,
+      freelancer_nome: 'Mariana Silva',
+      servico: 'Maquiagem Social Glam',
+      tipo: 'No Salão',
+      salao_nome: 'Studio Elegance Jardins',
+      distanciaKm: 1.2,
+      previsaoChegada: '15:00',
+      valor_total: 190.00,
+      taxa_salao: 25.00,
+      taxa_plataforma: 19.00,
+      valor_liquido: 146.00,
+      status: 'Confirmado',
+      data: '2026-10-20 às 15:00',
+      data_agendamento: '2026-10-20',
+      hora_agendamento: '15:00'
     },
     {
       id_atendimento: 1003,
+      id_freelancer: 2,
+      id_cliente: 109,
       cliente_nome: 'Juliana Costa',
+      cliente_avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
+      cliente_avaliacao: 5.0,
       freelancer_nome: 'Mariana Silva',
       servico: 'Manicure Gel & Nail Art',
       tipo: 'Domicílio',
@@ -225,11 +308,36 @@ const defaultState = {
       taxa_plataforma: 8.50,
       valor_liquido: 76.50,
       status: 'Concluído',
-      data: '02 Mai, 10:00'
+      data: '2026-10-18 às 10:00',
+      data_agendamento: '2026-10-18',
+      hora_agendamento: '10:00'
+    },
+    {
+      id_atendimento: 1024,
+      id_freelancer: 2,
+      id_cliente: 110,
+      cliente_nome: 'Amanda Prado',
+      cliente_avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80',
+      cliente_avaliacao: 5.0,
+      freelancer_nome: 'Mariana Silva',
+      servico: 'Corte & Hidratação Profunda',
+      tipo: 'No Salão',
+      salao_nome: 'Studio Elegance Jardins',
+      valor_total: 160.00,
+      taxa_salao: 20.00,
+      taxa_plataforma: 16.00,
+      valor_liquido: 124.00,
+      status: 'Confirmado',
+      data: '2026-10-22 às 15:30',
+      data_agendamento: '2026-10-22',
+      hora_agendamento: '15:30'
     },
     {
       id_atendimento: 1004,
+      id_cliente: 111,
       cliente_nome: 'Ricardo Alves',
+      cliente_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
+      cliente_avaliacao: 4.8,
       freelancer_nome: 'Ricardo Alves',
       servico: 'Limpeza de Pele Profunda',
       tipo: 'No Salão',
@@ -238,7 +346,9 @@ const defaultState = {
       taxa_plataforma: 21.00,
       valor_liquido: 159.00,
       status: 'Concluído',
-      data: '18 Abr, 16:15'
+      data: '2026-10-19 às 16:15',
+      data_agendamento: '2026-10-19',
+      hora_agendamento: '16:15'
     }
   ],
   // Formas de Pagamento cadastradas por perfil
@@ -412,10 +522,39 @@ class StateManager {
       }
 
       if (atendsRes && atendsRes.atendimentos) {
-        this.state.atendimentos = atendsRes.atendimentos.map(a => ({
-          ...a,
-          data: a.data_atendimento || a.data
-        }));
+        const dbAtendimentos = atendsRes.atendimentos.map(a => {
+          let dataAgendamento = a.data_agendamento;
+          let horaAgendamento = a.hora_agendamento;
+          if (!dataAgendamento && a.data_atendimento) {
+            const m = a.data_atendimento.match(/(\d{4}-\d{2}-\d{2})/);
+            if (m) dataAgendamento = m[1];
+            if (a.data_atendimento.toLowerCase().includes('hoje')) dataAgendamento = '2026-10-19';
+          }
+          if (!horaAgendamento && a.data_atendimento) {
+            const m = a.data_atendimento.match(/(\d{1,2}:\d{2})/);
+            if (m) horaAgendamento = m[1];
+          }
+
+          const existingMock = defaultState.atendimentos.find(m => m.id_atendimento === a.id_atendimento);
+
+          return {
+            ...a,
+            cliente_nome: (existingMock && existingMock.cliente_nome) || a.cliente_nome || 'Cliente',
+            cliente_avatar: (existingMock && existingMock.cliente_avatar) || a.cliente_avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+            data: a.data_atendimento || a.data,
+            data_agendamento: dataAgendamento || (existingMock && existingMock.data_agendamento) || (a.data && a.data.includes('Hoje') ? '2026-10-19' : null),
+            hora_agendamento: horaAgendamento || (existingMock && existingMock.hora_agendamento) || a.previsao_chegada || a.previsaoChegada || '14:30'
+          };
+        });
+
+        // Mesclar agendamentos do defaultState que não constem no banco para garantir riqueza de dados na agenda
+        defaultState.atendimentos.forEach(mockAt => {
+          if (!dbAtendimentos.some(a => a.id_atendimento === mockAt.id_atendimento)) {
+            dbAtendimentos.push(mockAt);
+          }
+        });
+
+        this.state.atendimentos = dbAtendimentos;
       }
 
       // Sincronizar dados financeiros e cadastrais do usuário autenticado a partir do banco
@@ -571,6 +710,24 @@ class StateManager {
     }
   }
 
+  async cancelarAtendimento(id_atendimento) {
+    const at = this.state.atendimentos.find(a => a.id_atendimento === id_atendimento);
+    if (at) {
+      at.status = 'Cancelado';
+      if (window.API) {
+        try {
+          await window.API.updateAtendimentoStatus(id_atendimento, 'Cancelado');
+        } catch (e) {
+          console.warn('Erro ao cancelar atendimento no backend:', e);
+        }
+      }
+      this.saveState();
+      this.notify();
+      return true;
+    }
+    return false;
+  }
+
   startCountdownTimer() {
     setInterval(() => {
       const reserva = this.state.rolesData &&
@@ -590,9 +747,11 @@ class StateManager {
   }
 
   getServicosByUsuario(id_usuario) {
-    const list = (this.state.servicosOfertados || []).filter(s => s.id_usuario === id_usuario);
-    if (list.length > 0) return list;
-    return (defaultState.servicosOfertados || []).filter(s => s.id_usuario === id_usuario);
+    if (!this.state.servicosOfertados) {
+      this.state.servicosOfertados = JSON.parse(JSON.stringify(defaultState.servicosOfertados || []));
+      this.saveState();
+    }
+    return (this.state.servicosOfertados || []).filter(s => s.id_usuario === id_usuario || s.id_usuario == id_usuario);
   }
 
   async adicionarServico({ id_usuario, nome, descricao, preco, duracao_minutos, senha }) {
@@ -631,15 +790,19 @@ class StateManager {
   }
 
   async removerServico(id_servico, id_usuario) {
-    if (this.state.servicosOfertados) {
-      this.state.servicosOfertados = this.state.servicosOfertados.filter(s => s.id_servico !== id_servico);
-      this.saveState();
+    if (!this.state.servicosOfertados) {
+      this.state.servicosOfertados = JSON.parse(JSON.stringify(defaultState.servicosOfertados || []));
     }
+    this.state.servicosOfertados = this.state.servicosOfertados.filter(s => s.id_servico !== id_servico && s.id_servico != id_servico);
+    this.saveState();
     if (window.API) {
       try {
         await window.API.deleteServico(id_servico, id_usuario);
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Erro ao remover serviço no backend:', e);
+      }
     }
+    return true;
   }
 
   async salvarFormaPagamento(role, dados) {
@@ -710,6 +873,32 @@ class StateManager {
     this.state.atendimentos.unshift(novoAtendimento);
     this.saveState();
     return novoAtendimento;
+  }
+
+  toggleFavoritoProfissional(id_usuario) {
+    if (!this.state.profissionais) return false;
+    const pro = this.state.profissionais.find(p => p.id_usuario === id_usuario);
+    if (pro) {
+      pro.isFavorita = !pro.isFavorita;
+      this.saveState();
+      this.notify();
+      return pro.isFavorita;
+    }
+    return false;
+  }
+
+  toggleFavoritoSalao(id_usuario) {
+    if (!this.state.saloes) {
+      this.state.saloes = JSON.parse(JSON.stringify(defaultState.saloes || []));
+    }
+    const salao = this.state.saloes.find(s => s.id_usuario === id_usuario);
+    if (salao) {
+      salao.isFavorita = !salao.isFavorita;
+      this.saveState();
+      this.notify();
+      return salao.isFavorita;
+    }
+    return false;
   }
 
   subscribe(listener) {

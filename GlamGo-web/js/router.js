@@ -72,6 +72,7 @@ class Router {
     if (window.renderHeader) window.renderHeader();
     if (window.renderNavbar) window.renderNavbar();
     if (window.renderSimulatorToolbar) window.renderSimulatorToolbar();
+    if (window.updateFabButton) window.updateFabButton(path);
 
     // If on client home, init Leaflet map
     if (path === '/cliente/home' || path === '/') {
@@ -97,3 +98,27 @@ class Router {
 }
 
 window.router = new Router();
+
+window.updateFabButton = function(path) {
+  const slot = document.getElementById('app-fab-slot');
+  if (!slot) return;
+
+  if (path === '/freelancer/home') {
+    slot.innerHTML = `
+      <button class="fab-btn" onclick="UI.openGerenciarServicosModal()" title="Criar e Gerenciar Serviços Ofertados">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span class="fab-tooltip">Criar Serviço Ofertado</span>
+      </button>
+    `;
+  } else if (path === '/salao/home' || path === '/salao/espacos') {
+    slot.innerHTML = `
+      <button class="fab-btn" onclick="UI.openGerenciarServicosModal()" title="Criar e Gerenciar Serviços Ofertados do Salão">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span class="fab-tooltip">Criar Serviço Ofertado</span>
+      </button>
+    `;
+  } else {
+    slot.innerHTML = '';
+  }
+};
+

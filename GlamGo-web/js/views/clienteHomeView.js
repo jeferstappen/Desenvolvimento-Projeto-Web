@@ -125,7 +125,17 @@ window.renderClienteHomeView = function() {
                   <div style="flex: 1;">
                     <div class="flex justify-between items-start">
                       <strong style="font-size: 0.95rem; color: var(--text-primary);">${salao.nome_completo}</strong>
-                      <span class="badge badge-emerald" style="font-size: 0.75rem;">★ ${salao.avaliacao}</span>
+                      <div class="flex items-center gap-1">
+                        <span class="badge badge-emerald" style="font-size: 0.75rem;">★ ${salao.avaliacao}</span>
+                        <button class="favorite-heart-btn ${salao.isFavorita ? 'is-favorited' : ''}" 
+                                style="width: 32px; height: 32px; box-shadow: none;"
+                                onclick="event.stopPropagation(); window.toggleFavoriteSalao(${salao.id_usuario}, this)" 
+                                title="${salao.isFavorita ? 'Remover dos favoritos' : 'Favoritar salão parceiro'}">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                     <div class="text-xs text-secondary" style="margin: 2px 0;">${salao.especialidade}</div>
                     <div class="flex items-center gap-2 text-xs text-muted">
@@ -187,9 +197,18 @@ window.renderClienteHomeView = function() {
                   <span class="text-xs font-bold text-teal">A partir de R$ ${pro.precoEstimado.toFixed(0)}</span>
                 </div>
               </div>
-              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); UI.openChamarModal(${pro.id_usuario})">
-                Agendar
-              </button>
+              <div class="flex items-center gap-2" style="flex-shrink: 0;">
+                <button class="favorite-heart-btn ${pro.isFavorita ? 'is-favorited' : ''}" 
+                        onclick="event.stopPropagation(); window.toggleFavoritePro(${pro.id_usuario}, this)" 
+                        title="${pro.isFavorita ? 'Remover dos favoritos' : 'Favoritar profissional'}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); UI.openChamarModal(${pro.id_usuario})">
+                  Agendar
+                </button>
+              </div>
             </div>
           `).join('')}
 
@@ -218,7 +237,17 @@ window.renderClienteHomeView = function() {
                       <strong style="font-size: 0.9rem; color: var(--text-primary);">${salao.nome_completo}</strong>
                       <div class="text-xs text-muted">📍 ${salao.endereco} • ${salao.distanciaKm} km</div>
                     </div>
-                    <span class="badge badge-teal" style="font-size: 0.7rem;">Ver Espaço ›</span>
+                    <div class="flex items-center gap-2">
+                      <button class="favorite-heart-btn ${salao.isFavorita ? 'is-favorited' : ''}" 
+                              style="width: 32px; height: 32px; box-shadow: none;"
+                              onclick="event.stopPropagation(); window.toggleFavoriteSalao(${salao.id_usuario}, this)" 
+                              title="${salao.isFavorita ? 'Remover dos favoritos' : 'Favoritar salão parceiro'}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                      </button>
+                      <span class="badge badge-teal" style="font-size: 0.7rem;">Ver Espaço ›</span>
+                    </div>
                   </div>
                 </div>
               `).join('')}
@@ -330,3 +359,46 @@ window.initMapIfPresent = function() {
 
   window.activeLeafletMap = map;
 };
+
+// Alternar Favorito para Profissional (Freelancer)
+window.toggleFavoritePro = function(id_usuario, btn) {
+  const isNowFav = window.appState.toggleFavoritoProfissional(id_usuario);
+  if (btn) {
+    btn.classList.toggle('is-favorited', isNowFav);
+    btn.title = isNowFav ? 'Remover dos favoritos' : 'Favoritar profissional';
+    const svg = btn.querySelector('svg');
+    if (svg) {
+      svg.setAttribute('fill', isNowFav ? '#EF4444' : 'none');
+      svg.setAttribute('stroke', isNowFav ? '#EF4444' : '#6B7280');
+    }
+  }
+  const pro = (window.appState.getState().profissionais || []).find(p => p.id_usuario === id_usuario);
+  const name = pro ? pro.nome_completo : 'Profissional';
+  if (isNowFav) {
+    UI.showToast(`❤️ ${name} adicionada aos favoritos!`, 'success');
+  } else {
+    UI.showToast(`Profissional removida dos favoritos.`, 'info');
+  }
+};
+
+// Alternar Favorito para Salão Parceiro
+window.toggleFavoriteSalao = function(id_usuario, btn) {
+  const isNowFav = window.appState.toggleFavoritoSalao(id_usuario);
+  if (btn) {
+    btn.classList.toggle('is-favorited', isNowFav);
+    btn.title = isNowFav ? 'Remover dos favoritos' : 'Favoritar salão parceiro';
+    const svg = btn.querySelector('svg');
+    if (svg) {
+      svg.setAttribute('fill', isNowFav ? '#EF4444' : 'none');
+      svg.setAttribute('stroke', isNowFav ? '#EF4444' : '#6B7280');
+    }
+  }
+  const salao = (window.getSaloesList ? window.getSaloesList() : []).find(s => s.id_usuario === id_usuario);
+  const name = salao ? salao.nome_completo : 'Salão';
+  if (isNowFav) {
+    UI.showToast(`🏢 ${name} adicionado aos favoritos!`, 'success');
+  } else {
+    UI.showToast(`Salão removido dos favoritos.`, 'info');
+  }
+};
+
