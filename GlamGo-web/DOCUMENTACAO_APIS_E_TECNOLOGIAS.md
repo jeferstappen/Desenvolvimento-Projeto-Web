@@ -398,24 +398,45 @@ Cria um novo chamado de pronto atendimento ou agendamento de múltiplos serviço
 }
 ```
 
-#### `PATCH /api/atendimentos/:id/status`
-Atualiza o status de um atendimento (ex: iniciar, concluir ou cancelar).
+#### `PATCH /api/atendimentos/:id/status` e `PUT /api/atendimentos/:id/status`
+Atualiza o status de um atendimento (ex: aceitar, recusar, iniciar, concluir ou cancelar).
 - **Body**:
 ```json
 {
-  "status": "Concluído | Cancelado | Em Andamento"
+  "status": "Em Andamento | Recusado | Concluído | Cancelado"
 }
 ```
+- **Transições de Estado (RF06 & Split Payment)**:
+  - `Pendente` ➔ `Em Andamento`: Profissional aceita a solicitação de atendimento (RF06).
+  - `Pendente` ➔ `Recusado`: Profissional recusa o atendimento com confirmação in-app (RF06).
+  - `Em Andamento` ➔ `Concluído`: Finalização do serviço com liquidação contábil e rateio financeiro (Split Payment na tabela `transacao` e crédito na carteira da freelancer).
+  - `Em Andamento` ou `Pendente` ➔ `Cancelado`: Cancelamento com modal interno de confirmação in-app.
 - **Resposta (200 OK)**:
 ```json
 {
   "success": true,
+  "message": "Status do atendimento alterado para Em Andamento.",
   "atendimento": {
-    "id_atendimento": 1001,
-    "status": "Concluído"
+    "id_atendimento": 1043,
+    "status": "Em Andamento"
   }
 }
 ```
+
+---
+
+### 4.6. Requisito RF06: Gestão de Solicitações Pendentes (Visualização, Aceite e Recusa)
+
+O requisito **RF06** assegura autonomia para a profissional autônoma escolher quais chamados atender:
+1. **Visualização Centralizada**:
+   - **Dashboard Home (`#/freelancer`)**: Bloco destacado **"🔔 SOLICITAÇÕES PENDENTES (RF06)"** exibindo avatar da cliente, avaliação em estrelas, distância via GPS, serviço solicitado, data/hora e valores (total e repasse líquido).
+   - **Agenda Interativa (`#/freelancer/agenda`)**: Destaque com badge âmbar `Pendente` na linha do tempo do dia.
+2. **Ação de Aceite (`window.aceitarSolicitacaoAtendimento`)**:
+   - Ao clicar em **"✓ Aceitar Atendimento"**, o status transiciona para `'Em Andamento'` no banco de dados e no estado local. O chamado passa imediatamente a ser o serviço ativo com previsão de chegada e botão "Finalizar Atendimento".
+3. **Ação de Recusa (`window.abrirModalRecusarSolicitacao`)**:
+   - Ao clicar em **"✕ Recusar"**, abre um modal de confirmação no padrão do aplicativo (sem popups externos), permitindo rejeitar o atendimento e atualizando o status para `'Recusado'`.
+4. **Cancelamento In-App de Agenda (`window.confirmarCancelamentoAgenda`)**:
+   - Totalmente integrado ao design system interno (`UI.openModal`), eliminando caixas de diálogo nativas do navegador (`window.confirm`) para uma experiência 100% PWA mobile nativa.
 
 ---
 

@@ -192,6 +192,9 @@ window.renderFreelancerAgendaView = function() {
           } else if (at.status === 'Pendente') {
             badgeClass = 'badge-amber';
             statusLabel = 'Pendente';
+          } else if (at.status === 'Recusado') {
+            badgeClass = 'badge-coral';
+            statusLabel = 'Recusado';
           } else if (at.status === 'Cancelado') {
             badgeClass = 'badge-coral';
           } else {
@@ -233,11 +236,19 @@ window.renderFreelancerAgendaView = function() {
                   <span class="text-emerald font-bold">Seu Líquido: R$ ${parseFloat(at.valor_liquido || (at.valor_total * 0.9)).toFixed(2)}</span>
                 </div>
 
-                <div class="flex gap-2 items-center">
+                <div class="flex gap-2 items-center flex-wrap">
                   <button class="btn btn-secondary btn-sm" onclick="UI.showToast('Abrindo conversa com ${clienteNome}...', 'info')">
                     💬 Mensagem
                   </button>
-                  ${at.status !== 'Concluído' && at.status !== 'Cancelado' ? `
+                  ${at.status === 'Pendente' ? `
+                    <button class="btn btn-emerald btn-sm" style="font-weight: 700;" onclick="window.aceitarSolicitacaoAtendimento(${at.id_atendimento})">
+                      ✓ Aceitar
+                    </button>
+                    <button class="btn btn-ghost btn-sm" style="color: var(--accent-coral); font-weight: 600;" onclick="window.abrirModalRecusarSolicitacao(${at.id_atendimento})">
+                      ✕ Recusar
+                    </button>
+                  ` : ''}
+                  ${at.status === 'Em Andamento' || at.status === 'Confirmado' ? `
                     <button class="btn btn-ghost btn-sm" style="color: var(--accent-coral);" onclick="window.confirmarCancelamentoAgenda(${at.id_atendimento})">
                       Cancelar
                     </button>
@@ -315,27 +326,9 @@ window.goToAgendaToday = function() {
   }
 };
 
-window.confirmarCancelamentoAgenda = async function(idAtendimento) {
-  const state = window.appState.getState();
-  const at = (state.atendimentos || []).find(a => a.id_atendimento === idAtendimento || a.id_atendimento == idAtendimento);
-  const cliente = (at && at.cliente_nome) || 'o cliente';
-  const servico = (at && at.servico) || 'o atendimento';
-
-  const confirmou = confirm(`Deseja realmente cancelar o agendamento de "${servico}" com ${cliente}?`);
-  if (!confirmou) return;
-
-  const sucesso = await window.appState.cancelarAtendimento(idAtendimento);
-  if (sucesso) {
-    if (window.UI && window.UI.showToast) {
-      window.UI.showToast('Agendamento cancelado com sucesso.', 'info');
-    }
-    if (window.router) {
-      window.router.renderCurrentRoute();
-    }
-  } else {
-    if (window.UI && window.UI.showToast) {
-      window.UI.showToast('Não foi possível cancelar o atendimento.', 'alert');
-    }
+window.confirmarCancelamentoAgenda = function(idAtendimento) {
+  if (window.UI && window.UI.openCancelarAgendaModal) {
+    window.UI.openCancelarAgendaModal(idAtendimento);
   }
 };
 

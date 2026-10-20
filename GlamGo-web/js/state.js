@@ -245,7 +245,7 @@ const defaultState = {
       taxa_salao: 20.00,
       taxa_plataforma: 13.00,
       valor_liquido: 97.00,
-      status: 'Confirmado',
+      status: 'Pendente',
       data: '2026-10-19 às 16:30',
       data_agendamento: '2026-10-19',
       hora_agendamento: '16:30'
@@ -710,8 +710,44 @@ class StateManager {
     }
   }
 
+  async aceitarAtendimento(id_atendimento) {
+    const at = this.state.atendimentos.find(a => a.id_atendimento === id_atendimento || a.id_atendimento == id_atendimento);
+    if (at) {
+      at.status = 'Em Andamento';
+      if (window.API) {
+        try {
+          await window.API.updateAtendimentoStatus(id_atendimento, 'Em Andamento');
+        } catch (e) {
+          console.warn('Erro ao aceitar atendimento no backend:', e);
+        }
+      }
+      this.saveState();
+      this.notify();
+      return true;
+    }
+    return false;
+  }
+
+  async recusarAtendimento(id_atendimento) {
+    const at = this.state.atendimentos.find(a => a.id_atendimento === id_atendimento || a.id_atendimento == id_atendimento);
+    if (at) {
+      at.status = 'Recusado';
+      if (window.API) {
+        try {
+          await window.API.updateAtendimentoStatus(id_atendimento, 'Recusado');
+        } catch (e) {
+          console.warn('Erro ao recusar atendimento no backend:', e);
+        }
+      }
+      this.saveState();
+      this.notify();
+      return true;
+    }
+    return false;
+  }
+
   async cancelarAtendimento(id_atendimento) {
-    const at = this.state.atendimentos.find(a => a.id_atendimento === id_atendimento);
+    const at = this.state.atendimentos.find(a => a.id_atendimento === id_atendimento || a.id_atendimento == id_atendimento);
     if (at) {
       at.status = 'Cancelado';
       if (window.API) {
@@ -838,7 +874,7 @@ class StateManager {
       taxa_salao: parseFloat(dados.taxa_salao || 0),
       taxa_plataforma: Math.round(dados.valor_total * 0.10 * 100) / 100,
       valor_liquido: Math.round((dados.valor_total - (dados.taxa_salao || 0) - (dados.valor_total * 0.10)) * 100) / 100,
-      status: 'Em Andamento',
+      status: dados.status || 'Pendente',
       data: `${dados.data_agendamento} às ${dados.hora_agendamento}`,
       data_agendamento: dados.data_agendamento,
       hora_agendamento: dados.hora_agendamento,
@@ -854,6 +890,7 @@ class StateManager {
           id_espaco: dados.id_espaco || null,
           servico: dados.servico,
           tipo: dados.tipo || 'No Salão',
+          status: novoAtendimento.status,
           valor_total: dados.valor_total,
           taxa_salao: dados.taxa_salao || 0,
           distancia_km: 1.2,

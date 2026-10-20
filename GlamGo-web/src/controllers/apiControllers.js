@@ -348,6 +348,7 @@ class AtendimentoController {
         id_espaco,
         servico,
         tipo,
+        status: req.body.status || 'Pendente',
         valor_total,
         taxa_salao,
         distancia_km,

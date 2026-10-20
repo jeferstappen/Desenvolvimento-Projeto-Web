@@ -19,6 +19,7 @@ class AtendimentoModel {
     id_espaco = null,
     servico,
     tipo = 'No Salão',
+    status = 'Pendente',
     valor_total,
     taxa_salao = 0.0,
     distancia_km = 1.2,
@@ -30,6 +31,7 @@ class AtendimentoModel {
   }) {
     const total = parseFloat(valor_total);
     const taxaSalao = parseFloat(taxa_salao) || 0.0;
+    const statusAtendimento = status || 'Pendente';
     
     // Obter taxa da plataforma configurada (default 10%)
     const configRow = db.queryOne("SELECT valor FROM configuracao_plataforma WHERE chave = 'taxa_plataforma_percentual'");
@@ -48,7 +50,7 @@ class AtendimentoModel {
         status, distancia_km, previsao_chegada, valor_total,
         taxa_salao, taxa_plataforma, valor_liquido, data_atendimento,
         data_agendamento, hora_agendamento, duracao_minutos, servicos_adicionais_json
-      ) VALUES (?, ?, ?, ?, ?, 'Em Andamento', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const result = db.run(sql, [
@@ -57,6 +59,7 @@ class AtendimentoModel {
       id_espaco,
       servico,
       tipo,
+      statusAtendimento,
       distancia_km,
       previsao_chegada,
       total,

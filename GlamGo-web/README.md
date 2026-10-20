@@ -15,6 +15,8 @@ Plataforma de beleza e bem-estar conectando **Clientes**, **Freelancers Autônom
 
 - **Módulo Freelancer Autônoma**:
   - Dashboard operacional com radar geolocalizado de 15km em tempo real.
+  - **RF06 - Gestão de Solicitações Pendentes**: visualização de chamados pendentes no topo do dashboard e na agenda, com opções de **Aceitar** (inicia atendimento) ou **Recusar**.
+  - **Cancelamento e Recusa 100% In-App**: modais internos responsivos integrados ao design system, sem popups nativos do navegador (`window.confirm`).
   - Controle de agenda interativo com marcação dinâmica de dias com atendimentos (pontos verdes).
   - Navegação semanal e visão mensal completa do calendário.
   - Reserva de cadeiras, macas e bancadas ociosas em salões parceiros (com timer garantido de 30 min).

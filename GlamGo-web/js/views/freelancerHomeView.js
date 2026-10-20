@@ -11,8 +11,14 @@ window.renderFreelancerHomeView = function() {
   const currentUser = state.currentUser;
   const currentProId = (currentUser && currentUser.id_usuario) || freeData.id_usuario;
 
+  // Filtrar solicitações PENDENTES da profissional (RF06)
+  const solicitacoesPendentes = (state.atendimentos || []).filter(a =>
+    a.status === 'Pendente' &&
+    (!a.id_freelancer || a.id_freelancer === currentProId || (a.freelancer_nome && (a.freelancer_nome.toLowerCase().includes('mariana') || a.freelancer_nome.toLowerCase().includes('verstappen'))))
+  );
+
   // Filtrar atendimento SOMENTE do freelancer logado com status Em Andamento
-  const atendimentoAtual = state.atendimentos.find(a =>
+  const atendimentoAtual = (state.atendimentos || []).find(a =>
     a.status === 'Em Andamento' &&
     (a.id_freelancer === currentProId || !a.id_freelancer)
   );
@@ -60,6 +66,81 @@ window.renderFreelancerHomeView = function() {
     <div class="view-content-padded animate-fade-in">
       ${reservaHtml}
 
+      <!-- Solicitações Pendentes (RF06: Visualizar, Aceitar ou Recusar) -->
+      ${solicitacoesPendentes.length > 0 ? `
+        <div class="pending-requests-container" style="margin-bottom: 20px;">
+          <div class="flex items-center justify-between" style="margin-bottom: 10px;">
+            <div class="flex items-center gap-2">
+              <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,0.25);"></span>
+              <h4 class="text-xs font-bold text-muted" style="text-transform: uppercase; letter-spacing: 0.5px;">SOLICITAÇÕES PENDENTES (RF06)</h4>
+            </div>
+            <span class="badge badge-amber" style="font-weight: 700;">${solicitacoesPendentes.length} pendente${solicitacoesPendentes.length > 1 ? 's' : ''}</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            ${solicitacoesPendentes.map(req => {
+              const clienteNome = req.cliente_nome || 'Cliente';
+              const avatar = req.cliente_avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80';
+              const rating = req.cliente_avaliacao ? parseFloat(req.cliente_avaliacao).toFixed(1) : '5.0';
+              const servicoNome = req.servico || 'Procedimento Estético';
+              const km = req.distanciaKm !== undefined ? req.distanciaKm : (req.distancia_km !== undefined ? req.distancia_km : 1.2);
+              const dataHora = req.data || `${req.data_agendamento || 'Hoje'} às ${req.hora_agendamento || req.previsao_chegada || '14:30'}`;
+              const localStr = req.tipo === 'Domicílio' ? 'Atendimento Domicílio' : (req.salao_nome ? `No Salão: ${req.salao_nome}` : 'No Salão Parceiro');
+              const total = parseFloat(req.valor_total || 0).toFixed(2);
+              const liquido = parseFloat(req.valor_liquido || (req.valor_total * 0.9)).toFixed(2);
+
+              return `
+                <div class="surface-card" style="border: 2px solid #F59E0B; border-radius: var(--radius-md); padding: 16px; background: var(--bg-card); box-shadow: var(--shadow-sm);">
+                  <div class="flex items-center justify-between" style="margin-bottom: 10px;">
+                    <span class="badge badge-amber" style="font-size: 0.7rem; font-weight: 700;">
+                      ⚡ Nova Solicitação
+                    </span>
+                    <span class="badge ${req.tipo === 'Domicílio' ? 'badge-teal' : 'badge-emerald'}" style="font-size: 0.7rem;">
+                      ${req.tipo || 'No Salão'}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center gap-3" style="margin-bottom: 12px;">
+                    <img src="${avatar}" alt="${clienteNome}" style="width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-light);" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'" />
+                    <div style="flex: 1;">
+                      <h4 class="font-extrabold text-sm text-primary" style="margin: 0; line-height: 1.2;">${clienteNome}</h4>
+                      <div class="flex items-center gap-2" style="margin-top: 2px;">
+                        <span class="text-xs text-muted">⭐ ${rating}</span>
+                        <span class="text-xs text-muted">•</span>
+                        <span class="text-xs text-secondary font-medium">📍 ${km} km de você</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="background: var(--bg-subtle); padding: 10px 12px; border-radius: var(--radius-xs); margin-bottom: 12px; font-size: 0.8rem;">
+                    <div class="font-bold text-primary" style="margin-bottom: 4px;">✂️ ${servicoNome}</div>
+                    <div class="text-xs text-secondary" style="margin-bottom: 4px;">📍 ${localStr}</div>
+                    <div class="text-xs text-muted">📅 ${dataHora}</div>
+                  </div>
+
+                  <div class="flex items-center justify-between" style="padding: 8px 12px; background: rgba(16, 185, 129, 0.08); border-radius: var(--radius-xs); margin-bottom: 14px; font-size: 0.8rem;">
+                    <span class="text-muted">Total: <strong class="text-primary">R$ ${total}</strong></span>
+                    <span class="text-emerald font-bold">Seu Líquido: R$ ${liquido}</span>
+                  </div>
+
+                  <div class="flex gap-2 items-center">
+                    <button class="btn btn-emerald btn-sm" style="flex: 1.3; font-weight: 700;" onclick="window.aceitarSolicitacaoAtendimento(${req.id_atendimento})">
+                      ✓ Aceitar Atendimento
+                    </button>
+                    <button class="btn btn-ghost btn-sm" style="color: var(--accent-coral); font-weight: 600;" onclick="window.abrirModalRecusarSolicitacao(${req.id_atendimento})">
+                      ✕ Recusar
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="UI.showToast('Abrindo conversa com ${clienteNome}...', 'info')">
+                      💬
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Card Atendimento Atual -->
       ${atendimentoAtual ? `
         <div class="current-service-card">
@@ -101,7 +182,7 @@ window.renderFreelancerHomeView = function() {
             Finalizar Atendimento
           </button>
         </div>
-      ` : `
+      ` : (solicitacoesPendentes.length === 0 ? `
         <div class="surface-card text-center" style="padding: 28px 24px; margin-bottom: 16px; border: 2px dashed var(--border-subtle);">
           <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary-teal), var(--primary-emerald)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
@@ -113,7 +194,7 @@ window.renderFreelancerHomeView = function() {
             <span class="badge badge-teal" style="padding: 4px 10px;">📡 GPS Online</span>
           </div>
         </div>
-      `}
+      ` : '')}
 
       <!-- Quick Earnings & Upcoming -->
       <div class="quick-stats-row">

@@ -762,5 +762,178 @@ window.UI = {
         </button>
       </div>
     `);
+  },
+
+  // Modal In-App para Cancelar Agendamento (Freelancer e Salão)
+  openCancelarAgendaModal(idAtendimento) {
+    const state = window.appState.getState();
+    const at = (state.atendimentos || []).find(a => a.id_atendimento === idAtendimento || a.id_atendimento == idAtendimento);
+    const cliente = (at && at.cliente_nome) || 'o cliente';
+    const servico = (at && at.servico) || 'o atendimento';
+    const dataHora = (at && (at.data || `${at.data_agendamento || ''} às ${at.hora_agendamento || ''}`)) || 'Horário agendado';
+    const local = at ? (at.tipo === 'Domicílio' ? 'Atendimento Domicílio' : (at.salao_nome ? `No Salão: ${at.salao_nome}` : 'No Salão Parceiro')) : '';
+
+    this.openModal(`
+      <div style="text-align: left;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <div style="width:42px;height:42px;border-radius:50%;background:#FEE2E2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin:0;font-size:1.1rem;color:var(--text-primary);">Cancelar Agendamento</h3>
+            <p class="text-xs text-muted" style="margin:0;">Esta ação liberará o horário na sua agenda</p>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px;">
+          <p style="font-size: 0.85rem; margin: 0 0 6px 0; color: var(--text-primary);">
+            <strong>✂️ Serviço:</strong> ${servico}
+          </p>
+          <p style="font-size: 0.85rem; margin: 0 0 6px 0; color: var(--text-secondary);">
+            <strong>👤 Cliente:</strong> ${cliente}
+          </p>
+          <p style="font-size: 0.8rem; margin: 0 0 4px 0; color: var(--text-muted);">
+            📅 <strong>Horário:</strong> ${dataHora}
+          </p>
+          ${local ? `<p style="font-size: 0.8rem; margin: 0; color: var(--text-muted);">📍 <strong>Local:</strong> ${local}</p>` : ''}
+        </div>
+
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.45;margin-bottom:18px;">
+          Deseja realmente cancelar o agendamento de <strong>"${servico}"</strong> com <strong>${cliente}</strong>?
+        </p>
+
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="UI.closeModal()">
+            Não, Manter
+          </button>
+          <button class="btn" style="flex:1.2;background:#DC2626;color:white;border:none;font-weight:700;" onclick="window.executarCancelamentoAgenda(${idAtendimento})">
+            Sim, Cancelar
+          </button>
+        </div>
+      </div>
+    `);
+  },
+
+  // Modal In-App para Recusar Solicitação de Atendimento Pendente (RF06)
+  openRecusarSolicitacaoModal(idAtendimento) {
+    const state = window.appState.getState();
+    const at = (state.atendimentos || []).find(a => a.id_atendimento === idAtendimento || a.id_atendimento == idAtendimento);
+    const cliente = (at && at.cliente_nome) || 'o cliente';
+    const servico = (at && at.servico) || 'o atendimento';
+    const dataHora = (at && (at.data || `${at.data_agendamento || ''} às ${at.hora_agendamento || ''}`)) || 'Horário solicitado';
+    const local = at ? (at.tipo === 'Domicílio' ? 'Atendimento Domicílio' : (at.salao_nome ? `No Salão: ${at.salao_nome}` : 'No Salão Parceiro')) : '';
+
+    this.openModal(`
+      <div style="text-align: left;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <div style="width:42px;height:42px;border-radius:50%;background:#FEF2F2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin:0;font-size:1.1rem;color:var(--text-primary);">Recusar Atendimento</h3>
+            <p class="text-xs text-muted" style="margin:0;">RF06 • Gestão de solicitações da profissional</p>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px;">
+          <p style="font-size: 0.85rem; margin: 0 0 6px 0; color: var(--text-primary);">
+            <strong>✂️ Serviço:</strong> ${servico}
+          </p>
+          <p style="font-size: 0.85rem; margin: 0 0 6px 0; color: var(--text-secondary);">
+            <strong>👤 Cliente:</strong> ${cliente}
+          </p>
+          <p style="font-size: 0.8rem; margin: 0 0 4px 0; color: var(--text-muted);">
+            📅 <strong>Data/Hora:</strong> ${dataHora}
+          </p>
+          ${local ? `<p style="font-size: 0.8rem; margin: 0; color: var(--text-muted);">📍 <strong>Local:</strong> ${local}</p>` : ''}
+        </div>
+
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.45;margin-bottom:18px;">
+          Deseja realmente recusar esta solicitação de atendimento? Ela será marcada como recusada e arquivada.
+        </p>
+
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="UI.closeModal()">
+            Voltar
+          </button>
+          <button class="btn" style="flex:1.2;background:#EF4444;color:white;border:none;font-weight:700;" onclick="window.executarRecusarSolicitacao(${idAtendimento})">
+            Sim, Recusar
+          </button>
+        </div>
+      </div>
+    `);
+  }
+};
+
+// =============================================================================
+// Funções Globais de Atendimento / Agenda (RF06 e Cancelamento In-App)
+// =============================================================================
+
+window.confirmarCancelamentoAgenda = function(idAtendimento) {
+  if (window.UI && window.UI.openCancelarAgendaModal) {
+    window.UI.openCancelarAgendaModal(idAtendimento);
+  }
+};
+
+window.executarCancelamentoAgenda = async function(idAtendimento) {
+  if (window.UI && window.UI.closeModal) window.UI.closeModal();
+  const sucesso = await window.appState.cancelarAtendimento(idAtendimento);
+  if (sucesso) {
+    if (window.UI && window.UI.showToast) {
+      window.UI.showToast('Agendamento cancelado com sucesso.', 'info');
+    }
+    if (window.router) {
+      window.router.renderCurrentRoute();
+    }
+  } else {
+    if (window.UI && window.UI.showToast) {
+      window.UI.showToast('Não foi possível cancelar o atendimento.', 'alert');
+    }
+  }
+};
+
+window.abrirModalRecusarSolicitacao = function(idAtendimento) {
+  if (window.UI && window.UI.openRecusarSolicitacaoModal) {
+    window.UI.openRecusarSolicitacaoModal(idAtendimento);
+  }
+};
+
+window.executarRecusarSolicitacao = async function(idAtendimento) {
+  if (window.UI && window.UI.closeModal) window.UI.closeModal();
+  const sucesso = await window.appState.recusarAtendimento(idAtendimento);
+  if (sucesso) {
+    if (window.UI && window.UI.showToast) {
+      window.UI.showToast('Solicitação de atendimento recusada.', 'info');
+    }
+    if (window.router) {
+      window.router.renderCurrentRoute();
+    }
+  } else {
+    if (window.UI && window.UI.showToast) {
+      window.UI.showToast('Não foi possível recusar o atendimento.', 'alert');
+    }
+  }
+};
+
+window.aceitarSolicitacaoAtendimento = async function(idAtendimento) {
+  const sucesso = await window.appState.aceitarAtendimento(idAtendimento);
+  if (sucesso) {
+    if (window.UI && window.UI.showToast) {
+      window.UI.showToast('Solicitação aceita! O atendimento agora está Em Andamento.', 'success');
+    }
+    if (window.router) {
+      window.router.renderCurrentRoute();
+    }
+  } else {
+    if (window.UI && window.UI.showToast) {
+      window.UI.showToast('Não foi possível aceitar a solicitação.', 'alert');
+    }
   }
 };
