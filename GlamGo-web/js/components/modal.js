@@ -177,10 +177,10 @@ window.UI = {
         <hr style="border: none; border-top: 1px dashed var(--border-subtle); margin: 10px 0;" />
         <div class="flex justify-between" style="margin-bottom: 4px;">
           <span class="text-secondary">Taxa Salão Parceiro:</span>
-          <span>R$ ${at.taxa_salao.toFixed(2)}</span>
+          <span>R$ ${parseFloat(at.taxa_salao || 0).toFixed(2)}</span>
         </div>
         <div class="flex justify-between" style="margin-bottom: 4px;">
-          <span class="text-secondary">Taxa Plataforma GlamGo (10%):</span>
+          <span class="text-secondary">Taxa Plataforma GlamGo (${at.taxa_plataforma_percentual || (at.valor_total > 0 ? Math.round((at.taxa_plataforma / at.valor_total) * 100) : (window.appState.getTaxaPlataformaPercentual ? window.appState.getTaxaPlataformaPercentual() : 10))}%):</span>
           <span>R$ ${at.taxa_plataforma.toFixed(2)}</span>
         </div>
         <div class="flex justify-between items-center" style="margin-top: 10px; font-size: 1.05rem;">

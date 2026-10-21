@@ -22,8 +22,8 @@ class Router {
 
       // Salão Parceiro
       '/salao/home': () => window.renderSalaoHomeView(),
-      '/salao/espacos': () => window.renderSalaoHomeView(),
-      '/salao/financeiro': () => window.renderFreelancerCarteiraView(),
+      '/salao/espacos': () => window.renderSalaoEspacosView(),
+      '/salao/financeiro': () => window.renderSalaoFinanceiroView(),
 
       // Universal Profile & Admin
       '/perfil': () => window.renderPerfilView(),

@@ -185,6 +185,10 @@ window.handleSaveAdminTaxa = async function() {
   const slider = document.getElementById('admin-rate-slider');
   const novaTaxa = parseFloat(slider ? slider.value : 10);
 
+  if (window.appState && window.appState.setTaxaPlataformaPercentual) {
+    window.appState.setTaxaPlataformaPercentual(novaTaxa);
+  }
+
   if (window.API) {
     try {
       await window.API.updateAdminTaxa(novaTaxa);

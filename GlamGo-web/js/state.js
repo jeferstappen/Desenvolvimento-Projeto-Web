@@ -415,7 +415,9 @@ const defaultState = {
     modalidade: 'todos',
     raioKm: 15,
     busca: ''
-  }
+  },
+  // Taxa de intermediação da plataforma (RF10)
+  taxaPlataformaPercentual: 10.0
 };
 
 class StateManager {
@@ -440,12 +442,26 @@ class StateManager {
         if (parsed.filtros) {
           parsed.filtros.busca = '';
         }
+        if (parsed.taxaPlataformaPercentual === undefined) {
+          parsed.taxaPlataformaPercentual = 10.0;
+        }
         return parsed;
       }
     } catch (e) {
       console.warn('Erro ao carregar localStorage:', e);
     }
     return JSON.parse(JSON.stringify(defaultState));
+  }
+
+  getTaxaPlataformaPercentual() {
+    return this.state && this.state.taxaPlataformaPercentual !== undefined ? parseFloat(this.state.taxaPlataformaPercentual) : 10.0;
+  }
+
+  setTaxaPlataformaPercentual(taxa) {
+    if (!this.state) return;
+    this.state.taxaPlataformaPercentual = parseFloat(taxa);
+    this.saveState();
+    this.notify();
   }
 
   saveState() {
@@ -862,6 +878,12 @@ class StateManager {
   }
 
   async criarAgendamento(dados) {
+    const valorTotal = parseFloat(dados.valor_total);
+    const taxaSalao = parseFloat(dados.taxa_salao || 0);
+    const taxaPct = this.getTaxaPlataformaPercentual();
+    const taxaPlataforma = Math.round(valorTotal * (taxaPct / 100) * 100) / 100;
+    const valorLiquido = Math.round((valorTotal - taxaSalao - taxaPlataforma) * 100) / 100;
+
     const novoAtendimento = {
       id_atendimento: Date.now(),
       id_cliente: dados.id_cliente,
@@ -870,10 +892,13 @@ class StateManager {
       freelancer_nome: dados.freelancer_nome,
       servico: dados.servico,
       tipo: dados.tipo || 'No Salão',
-      valor_total: parseFloat(dados.valor_total),
-      taxa_salao: parseFloat(dados.taxa_salao || 0),
-      taxa_plataforma: Math.round(dados.valor_total * 0.10 * 100) / 100,
-      valor_liquido: Math.round((dados.valor_total - (dados.taxa_salao || 0) - (dados.valor_total * 0.10)) * 100) / 100,
+      salao_nome: dados.tipo === 'No Salão' ? (dados.salao_nome || 'Studio Elegance Jardins') : null,
+      id_salao: dados.id_salao || (dados.tipo === 'No Salão' ? 3 : null),
+      valor_total: valorTotal,
+      taxa_salao: taxaSalao,
+      taxa_plataforma: taxaPlataforma,
+      taxa_plataforma_percentual: taxaPct,
+      valor_liquido: valorLiquido,
       status: dados.status || 'Pendente',
       data: `${dados.data_agendamento} às ${dados.hora_agendamento}`,
       data_agendamento: dados.data_agendamento,

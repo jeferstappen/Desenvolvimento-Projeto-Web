@@ -69,14 +69,6 @@ window.renderLoginView = function() {
             </button>
           </div>
 
-          <div class="demo-account-pills">
-            <div class="demo-pills-title">🚀 Acesso Rápido para Avaliação</div>
-            <div class="demo-pills-row">
-              <button class="demo-pill-btn" onclick="window.quickFillLogin('isabela.santos@email.com', '12345678')">👤 Cliente</button>
-              <button class="demo-pill-btn" onclick="window.quickFillLogin('mariana.silva@beauty.com', '12345678')">💇‍♀️ Freelancer</button>
-              <button class="demo-pill-btn" onclick="window.quickFillLogin('contato@studioelegance.com.br', '12345678')">🏢 Salão</button>
-            </div>
-          </div>
         </div>
       </div>
 

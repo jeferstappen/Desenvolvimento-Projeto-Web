@@ -10,24 +10,31 @@ window.renderFreelancerCarteiraView = function() {
   // Repasses reais vindos das transações concluídas no banco de dados
   const atendimentosConcluidos = (state.atendimentos || [])
     .filter(a => a.status === 'Concluído')
-    .map(a => ({
-      servico: a.servico,
-      data: a.data || a.data_atendimento || 'Hoje',
-      valorBruto: parseFloat(a.valor_total || 0),
-      taxaSalao: parseFloat(a.taxa_salao || 0),
-      taxaPlataforma: parseFloat(a.taxa_plataforma || (a.valor_total * 0.1)),
-      valorLiquido: parseFloat(a.valor_liquido || (a.valor_total * 0.9)),
-      tipo: a.tipo || 'No Salão'
-    }));
+    .map(a => {
+      const taxaPct = a.taxa_plataforma_percentual || (window.appState.getTaxaPlataformaPercentual ? window.appState.getTaxaPlataformaPercentual() : 10);
+      const taxaPlat = parseFloat(a.taxa_plataforma !== undefined ? a.taxa_plataforma : (a.valor_total * (taxaPct / 100)));
+      return {
+        servico: a.servico,
+        data: a.data || a.data_atendimento || 'Hoje',
+        valorBruto: parseFloat(a.valor_total || 0),
+        taxaSalao: parseFloat(a.taxa_salao || 0),
+        taxaPlataforma: taxaPlat,
+        taxaPlataformaPercentual: taxaPct,
+        valorLiquido: parseFloat(a.valor_liquido !== undefined ? a.valor_liquido : (a.valor_total - (a.taxa_salao || 0) - taxaPlat)),
+        tipo: a.tipo || 'No Salão'
+      };
+    });
 
+  const taxaGlobal = window.appState.getTaxaPlataformaPercentual ? window.appState.getTaxaPlataformaPercentual() : 10;
   const repassesFallback = [
     {
       servico: 'Maquiagem Social',
       data: '11 Out, 14:00',
       valorBruto: 100.00,
       taxaSalao: 15.00,
-      taxaPlataforma: 10.00,
-      valorLiquido: 75.00,
+      taxaPlataforma: 100.00 * (taxaGlobal / 100),
+      taxaPlataformaPercentual: taxaGlobal,
+      valorLiquido: 100.00 - 15.00 - (100.00 * (taxaGlobal / 100)),
       tipo: 'No Salão'
     },
     {
@@ -35,8 +42,9 @@ window.renderFreelancerCarteiraView = function() {
       data: '11 Out, 11:00',
       valorBruto: 130.00,
       taxaSalao: 20.00,
-      taxaPlataforma: 13.00,
-      valorLiquido: 97.00,
+      taxaPlataforma: 130.00 * (taxaGlobal / 100),
+      taxaPlataformaPercentual: taxaGlobal,
+      valorLiquido: 130.00 - 20.00 - (130.00 * (taxaGlobal / 100)),
       tipo: 'No Salão'
     }
   ];
@@ -104,7 +112,9 @@ window.renderFreelancerCarteiraView = function() {
       </div>
 
       <div class="repasses-list">
-        ${repasses.map(r => `
+        ${repasses.map(r => {
+          const pct = r.taxaPlataformaPercentual || (r.valorBruto > 0 ? Math.round((r.taxaPlataforma / r.valorBruto) * 100) : (window.appState.getTaxaPlataformaPercentual ? window.appState.getTaxaPlataformaPercentual() : 10));
+          return `
           <div class="split-breakdown-card">
             <div class="flex justify-between items-center">
               <div>
@@ -120,10 +130,11 @@ window.renderFreelancerCarteiraView = function() {
             <div class="split-pills-row">
               <span class="split-tag">Bruto: R$ ${r.valorBruto.toFixed(2)}</span>
               ${r.taxaSalao > 0 ? `<span class="split-tag" style="color: #D97706;">Salão: -R$ ${r.taxaSalao.toFixed(2)}</span>` : ''}
-              <span class="split-tag" style="color: var(--primary-teal);">Taxa App (10%): -R$ ${r.taxaPlataforma.toFixed(2)}</span>
+              <span class="split-tag" style="color: var(--primary-teal);">Taxa App (${pct}%): -R$ ${r.taxaPlataforma.toFixed(2)}</span>
             </div>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
     </div>
   `;

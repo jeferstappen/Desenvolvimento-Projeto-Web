@@ -1,99 +1,113 @@
 /**
- * AGhataCris - Salão Parceiro Home View (Dashboard de Espaços)
- * Corresponds to Figura 9 (Visão do Salão Parceiro: Painel Administrativo de Espaços)
+ * AGhataCris - Salão Parceiro Home View (Serviços Ofertados)
+ * Na Home do Salão são exibidos exclusivamente os serviços ofertados pela casa,
+ * permitindo criação, consulta, precificação e gerenciamento com segurança.
  */
 
 window.renderSalaoHomeView = function() {
   const state = window.appState.getState();
-  const salaoData = state.rolesData.salao;
-  const meusEspacos = state.espacos.filter(e => e.id_salao === salaoData.id_usuario || e.id_salao === 3);
+  const salaoData = state.rolesData.salao || {};
+  const salaoId = salaoData.id_usuario || 3;
+
+  // Buscar serviços ofertados pelo salão
+  const meusServicos = window.appState.getServicosByUsuario(salaoId);
 
   return `
     <div class="view-content-padded animate-fade-in">
-      <!-- Receita Passiva Banner -->
-      <div class="passive-income-banner">
-        <div class="flex justify-between items-center">
-          <span class="text-xs font-bold text-emerald" style="text-transform: uppercase; letter-spacing: 0.5px;">RECEITA PASSIVA (MÊS)</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald-dark)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-        </div>
-        <div class="passive-income-val" style="color: #16A34A !important;">R$ ${salaoData.receitaPassivaMes.toFixed(2)}</div>
-        <div class="flex justify-between items-center" style="font-size: 0.75rem;">
-          <span class="badge badge-emerald">▲ +12.5% vs ago</span>
-          <span class="text-secondary font-semibold">Próximo saque: 05/11</span>
+      <!-- Card Perfil / Apresentação do Salão -->
+      <div class="surface-card" style="margin-bottom: 16px; border: 1.5px solid var(--border-light); padding: 14px 16px;">
+        <div style="display: flex; gap: 14px; align-items: center;">
+          <img src="${salaoData.avatar || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300&auto=format&fit=crop&q=80'}" 
+               alt="${salaoData.nome_completo || 'Studio Elegance Jardins'}" 
+               style="width: 58px; height: 58px; border-radius: var(--radius-sm); object-fit: cover; border: 2px solid var(--primary-teal);" />
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <h3 class="font-extrabold text-base text-primary" style="margin: 0; line-height: 1.2;">
+                ${salaoData.nome_completo || 'Studio Elegance Jardins'}
+              </h3>
+              <span class="badge badge-emerald" style="font-size: 0.75rem;">★ ${parseFloat(salaoData.avaliacao || 4.9).toFixed(1)}</span>
+            </div>
+            <p class="text-xs text-muted" style="margin: 3px 0 0 0;">
+              📍 ${salaoData.endereco || 'Al. Santos, 1200 - Jardins'}
+            </p>
+            <span class="badge badge-teal" style="font-size: 0.65rem; margin-top: 4px; padding: 2px 6px;">
+              🏢 Salão Parceiro Credenciado • Lei 13.352/2016
+            </span>
+          </div>
         </div>
       </div>
 
-      <!-- Formulário de Novo Anúncio de Espaço -->
-      <div class="surface-card" style="margin-bottom: 20px;">
-        <div class="flex justify-between items-center" style="margin-bottom: 12px;">
-          <h3 class="font-extrabold text-sm text-primary">Novo Anúncio</h3>
-          <a href="javascript:void(0)" onclick="UI.showToast('Exibindo modelos sugeridos pela comunidade', 'info')" class="text-xs font-bold text-teal">Ver modelos</a>
+      <!-- Cabeçalho da Seção de Serviços Ofertados -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div>
+          <h3 class="font-extrabold text-sm text-primary" style="margin: 0;">Serviços Ofertados (${meusServicos.length})</h3>
+          <span class="text-xs text-muted">Procedimentos executados diretamente pela equipe do salão</span>
         </div>
-
-        <form onsubmit="event.preventDefault(); window.handleNovoEspacoRapido();">
-          <div class="form-group" style="margin-bottom: 10px;">
-            <label class="form-label">Qual o espaço?</label>
-            <input type="text" id="quick-space-type" placeholder="Ex: Cadeira de Corte, Maca..." required />
-          </div>
-
-          <div class="form-group" style="margin-bottom: 14px;">
-            <label class="form-label">Valor por Hora (<span style="color: #16A34A; font-weight: 700;">R$</span>)</label>
-            <input type="number" step="0.50" id="quick-space-price" placeholder="0,00" required />
-          </div>
-
-          <button type="submit" class="btn btn-emerald">
-            + Colocar na Rede
-          </button>
-        </form>
-      </div>
-
-      <!-- Lista de Espaços Ativos -->
-      <div class="flex justify-between items-center" style="margin-bottom: 12px;">
-        <h3 class="font-extrabold text-sm text-primary">Espaços Ativos</h3>
-        <button class="btn-ghost" onclick="UI.showToast('Filtro de espaços ativos', 'info')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+        <button class="btn btn-sm btn-emerald" style="font-weight: 700;" onclick="UI.openGerenciarServicosModal()">
+          + Novo Serviço
         </button>
       </div>
 
-      <div class="espacos-ativos-list">
-        ${meusEspacos.map(esp => `
-          <div class="space-item-card">
-            <div class="flex items-center gap-3">
-              <div class="space-thumb">
-                ✂️
-              </div>
-              <div>
-                <h4 class="font-bold text-sm text-primary">${esp.tipo_espaco}</h4>
-                <div class="text-xs font-bold" style="margin-top: 2px;"><span style="color: #16A34A !important; font-weight: 800; font-size: 0.9rem;">R$ ${esp.preco_hora.toFixed(2)}</span><span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 500;">/h</span></div>
-                <span class="text-xs text-muted" style="display: block; margin-top: 2px;">
-                  ${esp.status === 'Reservado' ? `🕒 Próxima reserva: ${esp.horario_proximo || '14:30'}` : `👁 ${esp.visualizacoes_hoje || 12} visualizações hoje`}
-                </span>
-              </div>
-            </div>
-
-            <div class="text-right">
-              <span class="badge ${esp.status === 'Disponível' ? 'badge-emerald' : 'badge-amber'}" onclick="window.appState.toggleEspacoStatus(${esp.id_espaco})" style="cursor: pointer;" title="Clique para alternar disponibilidade">
-                ${esp.status}
-              </span>
-            </div>
+      <!-- Lista de Serviços Ofertados pelo Salão -->
+      <div class="servicos-ofertados-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+        ${meusServicos.length === 0 ? `
+          <div class="surface-card text-center" style="padding: 24px 16px;">
+            <span style="font-size: 2rem;">💇‍♀️</span>
+            <h4 class="font-bold text-sm text-primary" style="margin: 8px 0 4px 0;">Nenhum serviço cadastrado</h4>
+            <p class="text-xs text-muted" style="margin-bottom: 12px;">Cadastre os procedimentos e pacotes ofertados pelo seu estabelecimento.</p>
+            <button class="btn btn-sm btn-primary" onclick="UI.openGerenciarServicosModal()">
+              + Cadastrar Primeiro Serviço
+            </button>
           </div>
-        `).join('')}
+        ` : meusServicos.map(s => {
+          const horas = Math.floor(s.duracao_minutos / 60);
+          const mins = s.duracao_minutos % 60;
+          const duracaoFormatada = horas > 0
+            ? (mins > 0 ? `${horas}h ${mins}min` : `${horas} hora${horas > 1 ? 's' : ''}`)
+            : `${mins} min`;
+
+          return `
+            <div class="surface-card" style="padding: 12px 14px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                <div style="flex: 1; padding-right: 8px;">
+                  <strong style="font-size: 0.95rem; color: var(--text-primary); display: block;">${s.nome}</strong>
+                  ${s.descricao ? `<p class="text-xs text-muted" style="margin: 3px 0 0 0; line-height: 1.35;">${s.descricao}</p>` : ''}
+                </div>
+                <div style="text-align: right; flex-shrink: 0;">
+                  <div class="font-extrabold text-emerald" style="font-size: 1.1rem; color: #16A34A !important;">
+                    R$ ${parseFloat(s.preco).toFixed(2)}
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; border-top: 1px dashed var(--border-subtle); padding-top: 8px;">
+                <span class="badge badge-teal" style="font-size: 0.7rem; font-weight: 600;">
+                  ⏱️ ${duracaoFormatada}
+                </span>
+
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-ghost btn-sm" style="font-size: 0.72rem; color: var(--text-muted); padding: 3px 8px;" onclick="window.confirmarExclusaoServicoModal(${s.id_servico})">
+                    🗑️ Remover
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Card Informativo / Atalho para a Aba Espaços -->
+      <div style="background: linear-gradient(135deg, rgba(13,148,136,0.08), rgba(16,185,129,0.08)); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong class="text-xs font-bold text-teal" style="display: block; text-transform: uppercase;">Locação de Infraestrutura</strong>
+            <span class="text-xs text-secondary">Acompanhe quem agendou suas cadeiras e macas no cronograma.</span>
+          </div>
+          <button class="btn btn-sm btn-ghost text-teal font-bold" onclick="window.location.hash = '#/salao/espacos'">
+            Ver Espaços →
+          </button>
+        </div>
       </div>
     </div>
   `;
-};
-
-window.handleNovoEspacoRapido = function() {
-  const tipo = document.getElementById('quick-space-type').value;
-  const preco = document.getElementById('quick-space-price').value;
-
-  if (!tipo || !preco) return;
-
-  window.appState.adicionarEspaco({
-    tipo_espaco: tipo,
-    preco_hora: preco
-  });
-
-  UI.showToast(`Espaço "${tipo}" anunciado na rede!`, 'success');
-  window.router.renderCurrentRoute();
 };
