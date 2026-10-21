@@ -909,6 +909,7 @@ class StateManager {
 
     this.state.atendimentos.unshift(novoAtendimento);
     this.saveState();
+    this.notify();
     return novoAtendimento;
   }
 

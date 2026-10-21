@@ -471,7 +471,11 @@ window.renderMonthCalendarModalContent = function() {
     </div>
   `;
 
-  window.UI.showModal(modalHtml);
+  if (window.UI.openModal) {
+    window.UI.openModal(modalHtml);
+  } else if (window.UI.showModal) {
+    window.UI.showModal(modalHtml);
+  }
 };
 
 window.selectDateFromMonthModal = function(iso) {

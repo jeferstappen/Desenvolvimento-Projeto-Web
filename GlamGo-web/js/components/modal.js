@@ -60,6 +60,10 @@ window.UI = {
     setTimeout(() => overlay.classList.add('active'), 10);
   },
 
+  showModal(htmlContent) {
+    return this.openModal(htmlContent);
+  },
+
   closeModal() {
     const overlay = document.getElementById('global-modal-overlay');
     if (overlay) {

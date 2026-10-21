@@ -12,7 +12,7 @@
 window._agendamentoState = {
   profissional: null,
   servicosSelecionados: [], // IDs dos serviços selecionados
-  dataSelecionada: '2026-10-17',
+  dataSelecionada: '2026-10-19', // Hoje
   horarioSelecionado: null,
   mesVisualizado: 9, // Outubro (0-indexed: 9 = Outubro)
   anoVisualizado: 2026
@@ -448,7 +448,7 @@ window.UI.openAgendamentoModal = function(idAlvo, tipoAlvo = 'freelancer') {
     isSalao,
     servicosDisponiveis: servicos,
     servicosSelecionados: primeiroServicoId ? [primeiroServicoId] : [],
-    dataSelecionada: '2026-10-17', // Hoje
+    dataSelecionada: '2026-10-19', // Hoje
     horarioSelecionado: null,
     mesVisualizado: 9, // Outubro (0-indexed)
     anoVisualizado: 2026
@@ -572,9 +572,9 @@ function renderAgendamentoModalContent() {
         ${renderMiniCalendarHtml(S.anoVisualizado, S.mesVisualizado, S.dataSelecionada)}
 
         <!-- Feedback de Validação da Regra de 1 Mês -->
-        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">
           <span style="color: var(--primary-teal);">●</span>
-          <span>Hoje é <strong>17/10/2026</strong>. Agendamentos permitidos até <strong>17/11/2026</strong>. Datas posteriores (como 18/11) estão bloqueadas.</span>
+          <span>Hoje é <strong>19/10/2026</strong>. Agendamentos permitidos até <strong>19/11/2026</strong>. Datas anteriores e posteriores estão bloqueadas.</span>
         </div>
       </div>
 
@@ -659,7 +659,7 @@ function renderAgendamentoModalContent() {
 }
 
 // =========================================================================
-// 3. CALENDÁRIO COM LIMITE ESTRITO DE 1 MÊS (17/10 a 17/11)
+// 3. CALENDÁRIO COM LIMITE ESTRITO DE 1 MÊS (19/10 a 19/11) & MARCADORES REAIS
 // =========================================================================
 function renderMiniCalendarHtml(ano, mes, dataSelecionadaStr) {
   // Nomes dos meses em português
@@ -669,15 +669,47 @@ function renderMiniCalendarHtml(ano, mes, dataSelecionadaStr) {
   ];
 
   // Regra de data:
-  // Data base atual: 17 de Outubro de 2026
+  // Data base atual do sistema: 19 de Outubro de 2026 (Segunda-feira)
   const hojeAno = 2026;
   const hojeMes = 9; // Outubro (0-indexed)
-  const hojeDia = 17;
+  const hojeDia = 19;
 
-  // Limite estrito de 1 mês à frente: 17 de Novembro de 2026
+  // Limite estrito de 1 mês à frente: 19 de Novembro de 2026
   const limiteAno = 2026;
   const limiteMes = 10; // Novembro (0-indexed)
-  const limiteDia = 17;
+  const limiteDia = 19;
+
+  // Mapear agendamentos reais existentes no sistema para esta entidade (freelancer ou salão)
+  const state = window.appState.getState();
+  const todosAtendimentos = state.atendimentos || [];
+  const diasComAgendamentos = new Set();
+  const contagemPorDia = {};
+  const S = window._agendamentoState || {};
+  const entityId = S.entity ? S.entity.id_usuario : null;
+
+  todosAtendimentos.forEach(a => {
+    if (a.status === 'Cancelado' || a.status === 'Recusado') return;
+
+    const matchEntity = !entityId || (
+      S.isSalao
+        ? (a.id_salao === entityId || (a.salao_nome && S.entity.nome_completo && a.salao_nome.toLowerCase().includes(S.entity.nome_completo.toLowerCase())))
+        : (!a.id_freelancer || a.id_freelancer === entityId || (a.freelancer_nome && S.entity.nome_completo && a.freelancer_nome.toLowerCase().includes(S.entity.nome_completo.toLowerCase())))
+    );
+
+    if (!matchEntity) return;
+
+    let iso = a.data_agendamento;
+    if (!iso && a.data) {
+      const m = a.data.match(/(\d{4}-\d{2}-\d{2})/);
+      if (m) iso = m[1];
+      else if (a.data.toLowerCase().includes('hoje')) iso = '2026-10-19';
+    }
+
+    if (iso) {
+      diasComAgendamentos.add(iso);
+      contagemPorDia[iso] = (contagemPorDia[iso] || 0) + 1;
+    }
+  });
 
   // Primeiro dia do mês e total de dias
   const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
@@ -698,10 +730,12 @@ function renderMiniCalendarHtml(ano, mes, dataSelecionadaStr) {
 
     const isToday = (ano === hojeAno && mes === hojeMes && dia === hojeDia);
     const isSelected = (dataIso === dataSelecionadaStr);
+    const hasEvents = diasComAgendamentos.has(dataIso);
+    const eventCount = contagemPorDia[dataIso] || 0;
 
-    // Validação estrita:
-    // 1. Data anterior a hoje (17/10/2026) -> Bloqueado
-    // 2. Data posterior a 1 mês (17/11/2026) -> Bloqueado (ex: dia 18 de novembro é bloqueado)
+    // Validação estrita de agendamento:
+    // 1. Data anterior a hoje (19/10/2026) -> Bloqueado para novos agendamentos
+    // 2. Data posterior a 1 mês (19/11/2026) -> Bloqueado
     let isDisabled = false;
 
     if (ano < hojeAno || (ano === hojeAno && mes < hojeMes)) {
@@ -711,13 +745,14 @@ function renderMiniCalendarHtml(ano, mes, dataSelecionadaStr) {
     } else if (ano > limiteAno || (ano === limiteAno && mes > limiteMes)) {
       isDisabled = true;
     } else if (ano === limiteAno && mes === limiteMes && dia > limiteDia) {
-      isDisabled = true; // Exemplo do prompt: 18 de novembro não pode!
+      isDisabled = true;
     }
 
     daysHtml += `
       <div 
-        class="calendar-day ${isDisabled ? 'disabled' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" 
-        ${!isDisabled ? `onclick="window.selectDataAgendamento('${dataIso}')"` : `title="Data indisponível (limite de 1 mês)"`}
+        class="calendar-day ${isDisabled ? 'disabled' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasEvents ? 'has-events' : ''}" 
+        ${!isDisabled ? `onclick="window.selectDataAgendamento('${dataIso}')"` : `title="Data indisponível"`}
+        title="${dia} de ${mesesNomes[mes]}${isToday ? ' (Hoje)' : ''}${hasEvents ? ` (${eventCount} agendamento${eventCount > 1 ? 's' : ''})` : ''}"
       >
         ${dia}
       </div>
@@ -747,12 +782,28 @@ function renderMiniCalendarHtml(ano, mes, dataSelecionadaStr) {
       <div class="calendar-grid">
         ${daysHtml}
       </div>
+
+      <!-- Legenda explicativa sincronizada -->
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; margin-top: 10px; font-size: 0.72rem; color: var(--text-secondary); background: var(--bg-subtle); padding: 6px 12px; border-radius: var(--radius-sm);">
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-emerald, #16A34A);"></span>
+          <span>Com agendamentos</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #000000;"></span>
+          <span>Hoje (19/10)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #000000;"></span>
+          <span>Selecionado</span>
+        </div>
+      </div>
     </div>
   `;
 }
 
 // =========================================================================
-// 4. DETECÇÃO DE CONFLITOS DE HORÁRIOS (com Duração do Serviço)
+// 4. DETECÇÃO DE CONFLITOS DE HORÁRIOS (com Duração e Agendamentos Reais)
 // =========================================================================
 function calcularSlotsComConflito(idProfissional, dataIso, duracaoTotalMinutos) {
   // Horários de atendimento da plataforma: das 08:00 às 18:30 em slots de 30 min
@@ -766,36 +817,38 @@ function calcularSlotsComConflito(idProfissional, dataIso, duracaoTotalMinutos) 
   // Buscar agendamentos existentes no State e no Banco para esse profissional nesta data
   const state = window.appState.getState();
   const todosAtendimentos = state.atendimentos || [];
-
-  // Agendamentos ocupados mockados ou reais para a data
-  // Para fins de demonstração clara e didática conforme exemplo do usuário:
-  // Se for o dia 17/10/2026, profissional tem atendimento às 14:30 com 1 hora de duração (14:30 até 15:30)
   const ocupadosData = [];
 
-  // Exemplo explícito do prompt do usuário:
-  // "por exemplo o cliente quer fazer chapinha e o free lancer colocou que isso demorara 1 hora, o usuario não podera agendar dentro dessa 1 hora"
-  if (dataIso === '2026-10-17' || dataIso.includes('10-17')) {
-    ocupadosData.push({
-      horaInicio: '14:30',
-      duracaoMinutos: 60, // 14:30 até 15:30
-      servico: 'Chapinha & Escova'
-    });
-    ocupadosData.push({
-      horaInicio: '10:00',
-      duracaoMinutos: 45, // 10:00 até 10:45
-      servico: 'Design de Sobrancelhas'
-    });
-  }
+  const S = window._agendamentoState || {};
 
-  // Incluir atendimentos reais gravados no state
+  // Incluir atendimentos reais gravados no state para a entidade e data selecionadas
   todosAtendimentos.forEach(at => {
-    if (at.status !== 'Cancelado' && at.status !== 'Recusado') {
-      const matchData = (at.data_agendamento === dataIso) || (at.data && at.data.includes(dataIso));
-      if (matchData && at.hora_agendamento) {
+    if (at.status === 'Cancelado' || at.status === 'Recusado') return;
+
+    const matchEntity = (!idProfissional) ||
+      (at.id_freelancer === idProfissional) ||
+      (at.id_salao === idProfissional) ||
+      (S.entity && (
+        (at.freelancer_nome && S.entity.nome_completo && at.freelancer_nome.toLowerCase().includes(S.entity.nome_completo.toLowerCase())) ||
+        (at.salao_nome && S.entity.nome_completo && at.salao_nome.toLowerCase().includes(S.entity.nome_completo.toLowerCase()))
+      ));
+
+    if (!matchEntity) return;
+
+    let atDataIso = at.data_agendamento;
+    if (!atDataIso && at.data) {
+      const m = at.data.match(/(\d{4}-\d{2}-\d{2})/);
+      if (m) atDataIso = m[1];
+      else if (at.data.toLowerCase().includes('hoje')) atDataIso = '2026-10-19';
+    }
+
+    if (atDataIso === dataIso) {
+      const hora = at.hora_agendamento || at.previsaoChegada || at.previsao_chegada;
+      if (hora) {
         ocupadosData.push({
-          horaInicio: at.hora_agendamento,
-          duracaoMinutos: at.duracao_minutos || 60,
-          servico: at.servico || 'Atendimento'
+          horaInicio: hora,
+          duracaoMinutos: parseInt(at.duracao_minutos || 60, 10),
+          servico: at.servico || 'Atendimento Marcado'
         });
       }
     }
@@ -957,6 +1010,10 @@ window.confirmarAgendamentoFinal = async function() {
       duracao_minutos: duracaoTotal,
       servicos_adicionais: selecionados
     });
+
+    // Sincronizar data global da agenda com o agendamento recém-criado
+    window.selectedAgendaDateIso = S.dataSelecionada;
+    window.agendaAnchorDateIso = S.dataSelecionada;
 
     UI.closeModal();
     UI.showToast(`Agendamento de ${nomesServicos} confirmado para ${formatarDataAmigavel(S.dataSelecionada)} às ${S.horarioSelecionado}!`, 'success');
